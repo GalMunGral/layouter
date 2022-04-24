@@ -1,0 +1,14 @@
+{
+  "name": "layouter",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "run-p \"build -- --watch\" serve",
+    "build": "tsc",
+    "serve": "serve docs"
+  },
+  "license": "ISC",
+  "devDependencies": {
+    "npm-run-all": "^4.1.5",
+    "typescript": "^4.6.3"
+  }
+}
