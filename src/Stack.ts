@@ -4,7 +4,7 @@ import { View } from "./View.js";
 export class Stack extends Container {
   protected finalize(child: View): void {
     const { frame, config: config } = child;
-    let [width, height] = config.dimensions ?? [0, 0];
+    let [width, height] = config.dimension ?? [0, 0];
     const [top, right, bottom, left] = config.margin!;
     if (top > -1 && bottom > -1) {
       frame.height = frame.height - top - bottom;

@@ -1,9 +1,19 @@
 import { Display } from "./Display.js";
+import { MouseClickEvent } from "./Event.js";
 import { View } from "./View.js";
 export class Text extends View {
     constructor(content, config) {
         super(config);
         this.content = content;
+    }
+    handle(e) {
+        super.handle(e);
+        if (e instanceof MouseClickEvent) {
+            this.config.weight++;
+            this.config.dimension[0]++;
+            this.config.dimension[1]++;
+            e.handled = true;
+        }
     }
     draw(dirty) {
         super.draw(dirty);

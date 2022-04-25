@@ -1,30 +1,40 @@
-import { Event, MouseEnterEvent, MouseExitEvent } from "./Event.js";
+import {
+  Event,
+  MouseClickEvent,
+  MouseEnterEvent,
+  MouseExitEvent,
+} from "./Event.js";
 import { Rect } from "./Geometry.js";
-import { HScroll } from "./HScroll.js";
 import { Config, View } from "./View.js";
 
 export class Container extends View {
-  private previousEvent?: Event;
-
   constructor(config: Partial<Config>, public children: View[] = []) {
     super(config);
+    for (let child of children) {
+      child.parent = this;
+    }
   }
 
-  handle(event: Event): void {
-    super.handle(event);
+  handle(e: Event): void {
     for (let child of this.children) {
-      if (child.frame.includes(event.point)) {
-        if (!child.frame.includes(this.previousEvent?.point)) {
-          child.handle(new MouseEnterEvent(event.point));
+      if (child.frame.includes(e.point)) {
+        if (!child.frame.includes(Event.previous?.point)) {
+          child.handle(new MouseEnterEvent(e.point));
         }
-        child.handle(event);
+        child.handle(e);
       } else {
-        if (child.frame.includes(this.previousEvent?.point)) {
-          child.handle(new MouseExitEvent(event.point));
+        if (child.frame.includes(Event.previous?.point)) {
+          child.handle(new MouseExitEvent(e.point));
         }
       }
     }
-    this.previousEvent = event;
+    super.handle(e);
+    if (e instanceof MouseClickEvent && !e.handled) {
+      this.config.weight++;
+      this.config.dimension[0]++;
+      this.config.dimension[1]++;
+      e.handled = true;
+    }
   }
 
   protected layoutChildren() {

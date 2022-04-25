@@ -1,4 +1,4 @@
-import { MouseDownEvent, MouseMoveEvent, MouseUpEvent } from "./Event.js";
+import { Event, MouseClickEvent, MouseDownEvent, MouseMoveEvent, MouseUpEvent, } from "./Event.js";
 import { Point, Rect } from "./Geometry.js";
 export class Display {
     constructor(root) {
@@ -24,13 +24,25 @@ export class Display {
             this.render();
         }, 100);
         window.onmousedown = (e) => {
-            this.root.handle(new MouseDownEvent(new Point(e.clientX, e.clientY)));
+            const pos = new Point(e.clientX, e.clientY);
+            const evt = new MouseDownEvent(pos);
+            this.root.handle(evt);
+            Event.previous = evt;
         };
         window.onmouseup = (e) => {
-            this.root.handle(new MouseUpEvent(new Point(e.clientX, e.clientY)));
+            const pos = new Point(e.clientX, e.clientY);
+            const evt = new MouseUpEvent(pos);
+            this.root.handle(evt);
+            if (Event.previous instanceof MouseDownEvent) {
+                this.root.handle(new MouseClickEvent(pos));
+            }
+            Event.previous = evt;
         };
         window.onmousemove = throttle((e) => {
-            this.root.handle(new MouseMoveEvent(new Point(e.clientX, e.clientY)));
+            const pos = new Point(e.clientX, e.clientY);
+            const evt = new MouseMoveEvent(pos);
+            this.root.handle(evt);
+            Event.previous = evt;
         });
     }
 }

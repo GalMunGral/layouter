@@ -23,18 +23,19 @@ export class Scroll extends Container {
         if (e instanceof MouseDownEvent) {
             this.scrolling = true;
             this.mousePosition = e.point;
+            e.handled = true;
         }
         else if (e instanceof MouseUpEvent) {
             this.scrolling = false;
             const simulateInertia = () => {
-                if (!this.delta) {
+                if (!this.delta)
                     return;
-                }
                 this.scroll(this.delta);
                 this.delta += this.delta > 0 ? -1 : 1;
                 setTimeout(simulateInertia, 16);
             };
             simulateInertia();
+            e.handled = true;
         }
     }
 }

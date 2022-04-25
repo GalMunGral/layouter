@@ -9,20 +9,21 @@ import { VStack } from "./VStack.js";
 const VList = (size: number) =>
   new VScroll(
     {
-      margin: [10, 10, 10, 10],
+      weight: 100,
+      margin: [20, 20, 20, 20],
       backgroundColor: "gray",
     },
     Array(size)
       .fill(0)
       .flatMap((_, i) => [
         new Text("ITEM " + 2 * i, {
-          backgroundColor: "#ffdddd",
-          dimensions: [Infinity, 50],
+          backgroundColor: "#ffcccc",
+          dimension: [Infinity, 50],
           margin: [10, 10, 0, 10],
         }),
         new Text("ITEM " + (2 * i + 1), {
-          backgroundColor: "#ddddff",
-          dimensions: [Infinity, 50],
+          backgroundColor: "#ccccff",
+          dimension: [Infinity, 50],
           margin: [10, 10, 0, 10],
         }),
       ])
@@ -31,8 +32,9 @@ const VList = (size: number) =>
 const HList = (size: number) =>
   new HScroll(
     {
-      margin: [10, 10, 10, 10],
+      margin: [0, 0, 0, 0],
       backgroundColor: "gray",
+      weight: 100,
     },
     Array(size)
       .fill(0)
@@ -40,13 +42,14 @@ const HList = (size: number) =>
         (_, i) =>
           new VStack(
             {
-              dimensions: [200, Infinity],
+              dimension: [200, Infinity],
               margin: [10, 0, 10, 10],
               backgroundColor: "black",
             },
             [
               new Text("TEST-" + i, {
-                dimensions: [Infinity, 20],
+                dimension: [Infinity, 20],
+                margin: [0, 0, 0, 0],
                 backgroundColor: "white",
                 weight: 0,
               }),
@@ -59,41 +62,33 @@ const HList = (size: number) =>
 const VList2 = (size: number) =>
   new VScroll(
     {
-      weight: 2,
-      margin: [10, 10, 10, 10],
+      weight: 200,
+      margin: [0, 0, 0, 0],
       backgroundColor: "gray",
     },
     Array(size)
       .fill(0)
       .map(
         (_, i) =>
-          new HStack(
+          new HScroll(
             {
-              dimensions: [Infinity, 200],
-              margin: [10, 0, 10, 10],
-              backgroundColor: "#ffffff",
+              dimension: [Infinity, 300],
+              margin: [10, 10, 10, 10],
+              backgroundColor: "#dddddd",
             },
-            [
-              new HScroll(
-                {
-                  margin: [10, 10, 10, 10],
-                  backgroundColor: "#dddddd",
-                },
-                Array(100)
-                  .fill(0)
-                  .map(
-                    (_, i) =>
-                      new VStack(
-                        {
-                          dimensions: [150, Infinity],
-                          margin: [10, 0, 10, 10],
-                          backgroundColor: "#bbbbbb",
-                        },
-                        [VList(size)]
-                      )
+            Array(100)
+              .fill(0)
+              .map(
+                (_, i) =>
+                  new VStack(
+                    {
+                      dimension: [400, Infinity],
+                      margin: [10, 0, 10, 10],
+                      backgroundColor: "#ffeeee",
+                    },
+                    [VList(size)]
                   )
-              ),
-            ]
+              )
           )
       )
   );
@@ -105,8 +100,8 @@ const fibonacciList = (width: number) => {
   let brightness = 0;
   while (b < 100) {
     children.push(
-      new View({
-        margin: [2, 2, 0, 2],
+      new Text(String(b), {
+        margin: [2, 40, 2, 40],
         weight: b,
         backgroundColor: `rgb(${brightness}, ${brightness}, ${brightness})`,
       })
@@ -116,9 +111,10 @@ const fibonacciList = (width: number) => {
   }
   return new VStack(
     {
-      dimensions: [width, Infinity],
+      dimension: [width, Infinity],
+      weight: 20,
       margin: [0, 0, 0, 0],
-      backgroundColor: "gray",
+      backgroundColor: "#ffaaaa",
     },
     children
   );
@@ -127,14 +123,14 @@ const fibonacciList = (width: number) => {
 new Display(
   new HStack(
     {
-      dimensions: [10, 10],
+      dimension: [10, 10],
       backgroundColor: "black",
     },
     [
       fibonacciList(200),
       new VStack(
         {
-          weight: 10,
+          weight: 200,
           margin: [0, 0, 0, 0],
         },
         [HList(100), VList2(10)]

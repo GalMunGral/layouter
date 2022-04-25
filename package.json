@@ -4,8 +4,7 @@
   "scripts": {
     "dev": "run-p \"build -- --watch\" serve",
     "build": "tsc",
-    "serve": "serve docs",
-    "clean": "rm -rf docs/**/*.js"
+    "serve": "serve docs"
   },
   "license": "ISC",
   "devDependencies": {

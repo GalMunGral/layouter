@@ -1,9 +1,14 @@
 import { Display } from "./Display.js";
-import { Event, MouseUpEvent } from "./Event.js";
+import {
+  Event,
+  MouseClickEvent,
+  MouseDownEvent,
+  MouseUpEvent,
+} from "./Event.js";
 import { Rect } from "./Geometry.js";
 
 export interface LayoutConfig {
-  dimensions: [number, number];
+  dimension: [number, number];
   margin: [number, number, number, number];
   weight: number;
 }
@@ -23,10 +28,11 @@ export class View {
   public frame: Rect = new Rect(0, 0, 0, 0);
   public visible: Rect | null = null;
   public config: Config;
+  public parent?: View;
 
-  constructor(config: Partial<Config>, public children: View[] = []) {
-    this.config = {
-      dimensions: config.dimensions ?? [0, 0],
+  constructor(config: Partial<Config>) {
+    const _config = {
+      dimension: config.dimension ?? [0, 0],
       margin: config.margin ?? [-1, -1, -1, -1],
       weight: config.weight ?? 1,
       backgroundColor: config.backgroundColor ?? "rgba(0,0,0,0)",
@@ -36,19 +42,39 @@ export class View {
       shadowcolor: config.shadowcolor ?? "rgba(0,0,0,0)",
       shadowWidth: config.shadowWidth ?? [0, 0, 0, 0],
     };
+    this.config = this.observe(_config);
   }
 
-  handle(e: Event): void {}
+  protected observe(config: Config): Config {
+    const view = this;
+    return new Proxy(config, {
+      set(target, prop, value, receiver) {
+        if (value == Reflect.get(target, prop, receiver)) return true;
+        try {
+          return Reflect.set(target, prop, value, receiver);
+        } finally {
+          if (prop == "dimension" || prop == "margin" || prop == "weight") {
+            view.parent?.layout();
+            view.parent?.redraw();
+          } else {
+            view.redraw();
+          }
+        }
+      },
+    });
+  }
 
-  layout(): void {}
-
-  redraw(): void {
+  protected redraw(): void {
     if (this.visible) {
       this.draw(this.visible);
     }
   }
 
-  draw(dirty: Rect): void {
+  public handle(e: Event): void {}
+
+  public layout(): void {}
+
+  public draw(dirty: Rect): void {
     const ctx = Display.instance.ctx;
     ctx.save();
 

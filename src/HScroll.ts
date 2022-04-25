@@ -8,6 +8,7 @@ export class HScroll extends Scroll {
       if (!this.scrolling) return;
       this.scroll(e.point.x - this.mousePosition.x);
       this.mousePosition = e.point;
+      e.handled = true;
     }
   }
 
@@ -16,7 +17,7 @@ export class HScroll extends Scroll {
     let y = this.frame.y;
     let contentWidth = 0;
     for (let child of this.children) {
-      let [width, height] = child.config.dimensions;
+      let [width, height] = child.config.dimension;
       let [top, right, bottom, left] = child.config.margin.map((x) =>
         Math.max(0, x)
       );

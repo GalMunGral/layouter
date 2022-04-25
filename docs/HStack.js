@@ -19,7 +19,7 @@ export class HStack extends Stack {
         let totalWeight = 0;
         for (let child of this.children) {
             const config = child.config;
-            total -= Math.min(config.dimensions[0], this.frame.width);
+            total -= Math.min(config.dimension[0], this.frame.width);
             totalWeight += config.weight;
         }
         let rem = total;
@@ -27,7 +27,7 @@ export class HStack extends Stack {
             const config = child.config;
             let extra = Math.round((total * config.weight) / totalWeight);
             rem -= extra;
-            child.frame.width = config.dimensions[0] + extra;
+            child.frame.width = config.dimension[0] + extra;
         }
         if (rem) {
             this.children[this.children.length - 1].frame.width += rem;
