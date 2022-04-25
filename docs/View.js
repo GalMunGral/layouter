@@ -1,154 +1,34 @@
 import { Rect } from "./Rect.js";
 export class View {
     constructor(config, children = []) {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j;
         this.children = children;
         this.frame = new Rect(0, 0, 0, 0);
         this.config = {
-            type: (_a = config.type) !== null && _a !== void 0 ? _a : "scroll",
-            direction: (_b = config.direction) !== null && _b !== void 0 ? _b : "vertical",
-            dimensions: (_c = config.dimensions) !== null && _c !== void 0 ? _c : [0, 0],
-            margin: (_d = config.margin) !== null && _d !== void 0 ? _d : [-1, -1, -1, -1],
-            weight: (_e = config.weight) !== null && _e !== void 0 ? _e : 1,
-            backgroundColor: (_f = config.backgroundColor) !== null && _f !== void 0 ? _f : "rgba(0,0,0,0)",
-            borderColor: (_g = config.borderColor) !== null && _g !== void 0 ? _g : "rgba(0,0,0,0)",
-            borderRadius: (_h = config.borderRadius) !== null && _h !== void 0 ? _h : [0, 0, 0, 0],
-            borderWidth: (_j = config.borderWidth) !== null && _j !== void 0 ? _j : [0, 0, 0, 0],
-            shadowcolor: (_k = config.shadowcolor) !== null && _k !== void 0 ? _k : "rgba(0,0,0,0)",
-            shadowWidth: (_l = config.shadowWidth) !== null && _l !== void 0 ? _l : [0, 0, 0, 0],
+            dimensions: (_a = config.dimensions) !== null && _a !== void 0 ? _a : [0, 0],
+            margin: (_b = config.margin) !== null && _b !== void 0 ? _b : [-1, -1, -1, -1],
+            weight: (_c = config.weight) !== null && _c !== void 0 ? _c : 1,
+            backgroundColor: (_d = config.backgroundColor) !== null && _d !== void 0 ? _d : "rgba(0,0,0,0)",
+            borderColor: (_e = config.borderColor) !== null && _e !== void 0 ? _e : "rgba(0,0,0,0)",
+            borderRadius: (_f = config.borderRadius) !== null && _f !== void 0 ? _f : [0, 0, 0, 0],
+            borderWidth: (_g = config.borderWidth) !== null && _g !== void 0 ? _g : [0, 0, 0, 0],
+            shadowcolor: (_h = config.shadowcolor) !== null && _h !== void 0 ? _h : "rgba(0,0,0,0)",
+            shadowWidth: (_j = config.shadowWidth) !== null && _j !== void 0 ? _j : [0, 0, 0, 0],
         };
     }
-    layout() {
-        for (let child of this.children) {
-            const config = child.config;
-            if (!config.dimensions)
-                config.dimensions = [0, 0];
-            if (!config.weight)
-                config.weight = 1;
-            if (!config.margin)
-                config.margin = [-1, -1, -1, -1];
-        }
-        if (this.config.type == "stack") {
-            this.stackLayout();
-        }
-        else {
-            this.scrollLayout();
-        }
-    }
-    scrollLayout() { }
-    stackLayout() {
-        if (this.config.direction == "vertical") {
-            let total = this.frame.height;
-            let totalWeight = 0;
-            for (let child of this.children) {
-                const config = child.config;
-                total -= config.dimensions[1];
-                totalWeight += config.weight;
-            }
-            let rem = total;
-            for (let child of this.children) {
-                const config = child.config;
-                let extra = Math.round((total * config.weight) / totalWeight);
-                rem -= extra;
-                child.frame.height = config.dimensions[1] + extra;
-            }
-            if (rem) {
-                this.children[this.children.length - 1].frame.height += rem;
-            }
-            let y = this.frame.y;
-            for (let child of this.children) {
-                child.frame.width = this.frame.width;
-                child.frame.x = this.frame.x;
-                child.frame.y = y;
-                y += child.frame.height;
-            }
-        }
-        else {
-            let total = this.frame.width;
-            let totalWeight = 0;
-            for (let child of this.children) {
-                const config = child.config;
-                total -= config.dimensions[0];
-                totalWeight += config.weight;
-            }
-            let rem = total;
-            for (let child of this.children) {
-                const config = child.config;
-                let extra = Math.round((total * config.weight) / totalWeight);
-                rem -= extra;
-                child.frame.width = config.dimensions[0] + extra;
-            }
-            if (rem) {
-                this.children[this.children.length - 1].frame.width += rem;
-            }
-            let x = this.frame.y;
-            for (let child of this.children) {
-                child.frame.height = this.frame.height;
-                child.frame.y = this.frame.y;
-                child.frame.x = x;
-                x += child.frame.width;
-            }
-        }
-        for (let child of this.children) {
-            this.finalize(child);
-            child.layout();
-        }
-    }
-    finalize(child) {
+    layout() { }
+    draw(ctx, clip) {
         var _a;
-        const { frame, config: config } = child;
-        let [width, height] = (_a = config.dimensions) !== null && _a !== void 0 ? _a : [0, 0];
-        const [top, right, bottom, left] = config.margin;
-        if (top > -1 && bottom > -1) {
-            frame.height = frame.height - top - bottom;
-            frame.y += top;
-        }
-        else if (top > -1) {
-            frame.height = Math.min(height, frame.height - top);
-            frame.y += top;
-        }
-        else if (bottom > -1) {
-            height = Math.min(height, frame.height - bottom);
-            const top = frame.height - height - bottom;
-            frame.height = height;
-            frame.y += top;
-        }
-        else {
-            height = Math.min(height, frame.height);
-            const top = Math.floor((frame.height - height) / 2);
-            frame.height = height;
-            frame.y += top;
-        }
-        if (left > -1 && right > -1) {
-            frame.width = frame.width - left - right;
-            frame.x += left;
-        }
-        else if (left > -1) {
-            frame.width = Math.min(width, frame.width - top);
-            frame.x += top;
-        }
-        else if (right > -1) {
-            width = Math.min(width, frame.width - right);
-            const left = frame.width - width - right;
-            frame.width = width;
-            frame.x += left;
-        }
-        else {
-            width = Math.min(width, frame.width);
-            const left = Math.floor((frame.width - width) / 2);
-            frame.width = width;
-            frame.x += left;
-        }
-    }
-    draw(ctx) {
-        var _a;
+        const frame = this.frame;
+        clip = clip ? this.frame.intersection(clip) : this.frame;
+        if (!(clip === null || clip === void 0 ? void 0 : clip.width) || !clip.height)
+            return;
         ctx.save();
+        ctx.rect(clip.x, clip.y, clip.width, clip.height);
+        ctx.clip();
         ctx.fillStyle = (_a = this.config.backgroundColor) !== null && _a !== void 0 ? _a : "black";
         const { x, y, width, height } = this.frame;
         ctx.fillRect(x, y, width, height);
-        for (let child of this.children) {
-            child.draw(ctx);
-        }
         ctx.restore();
     }
 }
