@@ -10,8 +10,8 @@ export class Rect {
     public height: number
   ) {}
 
-  intersection(other: Rect | null): Rect | null {
-    if (!other) return this;
+  intersect(other: Rect | null): Rect | null {
+    if (!other) return null;
     const left = Math.max(this.x, other.x);
     const right = Math.min(this.x + this.width, other.x + other.width);
     if (left >= right) return null;

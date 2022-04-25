@@ -5,6 +5,7 @@ export class View {
         var _a, _b, _c, _d, _e, _f, _g, _h, _j;
         this.children = children;
         this.frame = new Rect(0, 0, 0, 0);
+        this.visible = null;
         this.config = {
             dimensions: (_a = config.dimensions) !== null && _a !== void 0 ? _a : [0, 0],
             margin: (_b = config.margin) !== null && _b !== void 0 ? _b : [-1, -1, -1, -1],
@@ -19,15 +20,17 @@ export class View {
     }
     handle(e) { }
     layout() { }
-    draw(dirty = null) {
+    redraw() {
+        if (this.visible) {
+            this.draw(this.visible);
+        }
+    }
+    draw(dirty) {
         var _a;
-        const clip = this.frame.intersection(dirty);
-        if (!clip)
-            return;
         const ctx = Display.instance.ctx;
         ctx.save();
         ctx.beginPath();
-        ctx.rect(clip.x, clip.y, clip.width, clip.height);
+        ctx.rect(dirty.x, dirty.y, dirty.width, dirty.height);
         ctx.clip();
         ctx.fillStyle = (_a = this.config.backgroundColor) !== null && _a !== void 0 ? _a : "black";
         const { x, y, width, height } = this.frame;

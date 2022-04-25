@@ -11,9 +11,9 @@ export class Rect {
         this.width = width;
         this.height = height;
     }
-    intersection(other) {
+    intersect(other) {
         if (!other)
-            return this;
+            return null;
         const left = Math.max(this.x, other.x);
         const right = Math.min(this.x + this.width, other.x + other.width);
         if (left >= right)

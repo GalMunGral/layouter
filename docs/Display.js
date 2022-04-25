@@ -3,26 +3,43 @@ import { Point, Rect } from "./Geometry.js";
 export class Display {
     constructor(root) {
         this.root = root;
-        this.frame = new Rect(0, 0, window.innerWidth, window.innerHeight);
+        this.canvas = document.createElement("canvas");
+        this.ctx = this.canvas.getContext("2d");
         Display.instance = this;
-        this.root.frame = this.frame;
-        const canvas = document.createElement("canvas");
-        this.ctx = canvas.getContext("2d");
-        this.setupCanvas(canvas);
-    }
-    setupCanvas(el) {
-        el.width = window.innerWidth;
-        el.height = window.innerHeight;
-        el.onmousedown = (e) => this.root.handle(new MouseDownEvent(new Point(e.clientX, e.clientY)));
-        el.onmouseup = (e) => this.root.handle(new MouseUpEvent(new Point(e.clientX, e.clientY)));
-        el.onmousemove = throttle((e) => this.root.handle(new MouseMoveEvent(new Point(e.clientX, e.clientY))));
+        this.setupEvents();
         document.body.style.margin = "0px";
-        document.body.append(el);
+        document.body.append(this.canvas);
+        this.render();
     }
-    draw() {
+    render() {
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+        this.root.frame = new Rect(0, 0, this.canvas.width, this.canvas.height);
+        this.root.visible = this.root.frame;
         this.root.layout();
-        this.root.draw();
+        this.root.draw(this.root.frame);
     }
+    setupEvents() {
+        window.onresize = debounce(() => {
+            this.render();
+        }, 100);
+        window.onmousedown = (e) => {
+            this.root.handle(new MouseDownEvent(new Point(e.clientX, e.clientY)));
+        };
+        window.onmouseup = (e) => {
+            this.root.handle(new MouseUpEvent(new Point(e.clientX, e.clientY)));
+        };
+        window.onmousemove = throttle((e) => {
+            this.root.handle(new MouseMoveEvent(new Point(e.clientX, e.clientY)));
+        });
+    }
+}
+function debounce(f, timeout = 16) {
+    let handle = -1;
+    return function () {
+        clearTimeout(handle);
+        handle = setTimeout(f, timeout, ...arguments);
+    };
 }
 function throttle(f, timeout = 16) {
     let t = Date.now();

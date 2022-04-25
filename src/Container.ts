@@ -1,5 +1,6 @@
 import { Event, MouseEnterEvent, MouseExitEvent } from "./Event.js";
 import { Rect } from "./Geometry.js";
+import { HScroll } from "./HScroll.js";
 import { Config, View } from "./View.js";
 
 export class Container extends View {
@@ -10,6 +11,7 @@ export class Container extends View {
   }
 
   handle(event: Event): void {
+    super.handle(event);
     for (let child of this.children) {
       if (child.frame.includes(event.point)) {
         if (!child.frame.includes(this.previousEvent?.point)) {
@@ -25,11 +27,18 @@ export class Container extends View {
     this.previousEvent = event;
   }
 
-  draw(dirty: Rect | null = null) {
-    super.draw(dirty);
-    dirty = this.frame.intersection(dirty);
+  protected layoutChildren() {
     for (let child of this.children) {
-      child.draw(dirty);
+      child.visible = child.frame.intersect(this.visible);
+      child.layout();
+    }
+  }
+
+  draw(dirty: Rect) {
+    super.draw(dirty);
+    for (let child of this.children) {
+      const d = dirty.intersect(child.visible);
+      if (d) child.draw(d);
     }
   }
 }

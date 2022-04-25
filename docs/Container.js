@@ -7,6 +7,7 @@ export class Container extends View {
     }
     handle(event) {
         var _a, _b;
+        super.handle(event);
         for (let child of this.children) {
             if (child.frame.includes(event.point)) {
                 if (!child.frame.includes((_a = this.previousEvent) === null || _a === void 0 ? void 0 : _a.point)) {
@@ -22,11 +23,18 @@ export class Container extends View {
         }
         this.previousEvent = event;
     }
-    draw(dirty = null) {
-        super.draw(dirty);
-        dirty = this.frame.intersection(dirty);
+    layoutChildren() {
         for (let child of this.children) {
-            child.draw(dirty);
+            child.visible = child.frame.intersect(this.visible);
+            child.layout();
+        }
+    }
+    draw(dirty) {
+        super.draw(dirty);
+        for (let child of this.children) {
+            const d = dirty.intersect(child.visible);
+            if (d)
+                child.draw(d);
         }
     }
 }

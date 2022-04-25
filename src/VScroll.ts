@@ -1,48 +1,33 @@
-import { Container } from "./Container.js";
-import {
-  Event,
-  MouseDownEvent,
-  MouseMoveEvent,
-  MouseUpEvent,
-} from "./Event.js";
-import { Point } from "./Geometry.js";
+import { Event, MouseMoveEvent } from "./Event.js";
+import { Scroll } from "./Scroll.js";
 
-export class VScroll extends Container {
-  private offset = 0;
-  private maxOffset = 0;
-  private mousePosition: Point | null = null;
-
+export class VScroll extends Scroll {
   handle(e: Event): void {
-    if (e instanceof MouseDownEvent) {
+    super.handle(e);
+    if (e instanceof MouseMoveEvent) {
+      if (!this.scrolling) return;
+      this.scroll(e.point.y - this.mousePosition.y);
       this.mousePosition = e.point;
-    } else if (e instanceof MouseUpEvent) {
-      this.mousePosition = null;
-    } else if (e instanceof MouseMoveEvent) {
-      if (!this.mousePosition) return;
-      this.offset += e.point.y - this.mousePosition.y;
-      this.offset = Math.min(this.offset, 0);
-      this.offset = Math.max(this.offset, -this.maxOffset);
-      this.mousePosition = e.point;
-      this.layout();
-      this.draw();
     }
   }
 
   layout(): void {
     let x = this.frame.x;
     let y = this.frame.y + this.offset;
+    let contentHeight = 0;
     for (let child of this.children) {
       let [width, height] = child.config.dimensions;
       let [top, right, bottom, left] = child.config.margin.map((x) =>
         Math.max(0, x)
       );
-      width = Math.min(width, this.frame.width - left - right);
       child.frame.x = x + left;
       child.frame.y = y + top;
-      child.frame.width = width;
-      child.frame.height = height;
-      y += top + height + bottom;
+      child.frame.width = Math.min(width, this.frame.width - left - right);
+      child.frame.height = height - top - bottom;
+      y += height;
+      contentHeight += height;
     }
-    this.maxOffset = y - this.frame.height;
+    this.minOffset = this.frame.height - contentHeight;
+    this.layoutChildren();
   }
 }

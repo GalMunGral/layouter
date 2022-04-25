@@ -2,7 +2,7 @@ import { Stack } from "./Stack.js";
 export class HStack extends Stack {
     layout() {
         this.allocateWidth();
-        let x = this.frame.y;
+        let x = this.frame.x;
         for (let child of this.children) {
             child.frame.height = this.frame.height;
             child.frame.y = this.frame.y;
@@ -11,15 +11,15 @@ export class HStack extends Stack {
         }
         for (let child of this.children) {
             this.finalize(child);
-            child.layout();
         }
+        this.layoutChildren();
     }
     allocateWidth() {
         let total = this.frame.width;
         let totalWeight = 0;
         for (let child of this.children) {
             const config = child.config;
-            total -= config.dimensions[0];
+            total -= Math.min(config.dimensions[0], this.frame.width);
             totalWeight += config.weight;
         }
         let rem = total;

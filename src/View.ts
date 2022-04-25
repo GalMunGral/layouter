@@ -21,6 +21,7 @@ export type Config = LayoutConfig & StyleConfig;
 
 export class View {
   public frame: Rect = new Rect(0, 0, 0, 0);
+  public visible: Rect | null = null;
   public config: Config;
 
   constructor(config: Partial<Config>, public children: View[] = []) {
@@ -41,15 +42,18 @@ export class View {
 
   layout(): void {}
 
-  draw(dirty: Rect | null = null): void {
-    const clip = this.frame.intersection(dirty);
-    if (!clip) return;
+  redraw(): void {
+    if (this.visible) {
+      this.draw(this.visible);
+    }
+  }
 
+  draw(dirty: Rect): void {
     const ctx = Display.instance.ctx;
     ctx.save();
 
     ctx.beginPath();
-    ctx.rect(clip.x, clip.y, clip.width, clip.height);
+    ctx.rect(dirty.x, dirty.y, dirty.width, dirty.height);
     ctx.clip();
 
     ctx.fillStyle = this.config.backgroundColor ?? "black";
