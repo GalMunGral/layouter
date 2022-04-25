@@ -21,39 +21,35 @@ const test = new View(
   },
   [
     new View({
-      type: "scroll",
-      direction: "vertical",
       margin: [20, 10, 20, 10],
       backgroundColor: "green",
     }),
     new View(
       {
         type: "stack",
-        direction: "vertical",
         dimensions: [10, 10],
         margin: [0, 0, 0, 0],
         backgroundColor: "red",
       },
       [
         new View({
-          type: "scroll",
-          direction: "vertical",
-          dimensions: [10, 30],
+          margin: [5, 5, 0, 5],
+          weight: 2,
           backgroundColor: "white",
         }),
         new View({
-          type: "scroll",
-          direction: "vertical",
-          dimensions: [10, 10],
+          margin: [5, 5, 0, 5],
+          weight: 2,
+          backgroundColor: "white",
+        }),
+        new View({
           margin: [5, 5, 5, 5],
-          weight: 4,
+          weight: 10,
           backgroundColor: "white",
         }),
       ]
     ),
     new View({
-      type: "scroll",
-      direction: "vertical",
       margin: [10, 10, 10, 10],
       backgroundColor: "blue",
     }),

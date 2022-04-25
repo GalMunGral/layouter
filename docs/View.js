@@ -1,9 +1,22 @@
 import { Rect } from "./Rect.js";
 export class View {
     constructor(config, children = []) {
-        this.config = config;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
         this.children = children;
         this.frame = new Rect(0, 0, 0, 0);
+        this.config = {
+            type: (_a = config.type) !== null && _a !== void 0 ? _a : "scroll",
+            direction: (_b = config.direction) !== null && _b !== void 0 ? _b : "vertical",
+            dimensions: (_c = config.dimensions) !== null && _c !== void 0 ? _c : [0, 0],
+            margin: (_d = config.margin) !== null && _d !== void 0 ? _d : [-1, -1, -1, -1],
+            weight: (_e = config.weight) !== null && _e !== void 0 ? _e : 1,
+            backgroundColor: (_f = config.backgroundColor) !== null && _f !== void 0 ? _f : "rgba(0,0,0,0)",
+            borderColor: (_g = config.borderColor) !== null && _g !== void 0 ? _g : "rgba(0,0,0,0)",
+            borderRadius: (_h = config.borderRadius) !== null && _h !== void 0 ? _h : [0, 0, 0, 0],
+            borderWidth: (_j = config.borderWidth) !== null && _j !== void 0 ? _j : [0, 0, 0, 0],
+            shadowcolor: (_k = config.shadowcolor) !== null && _k !== void 0 ? _k : "rgba(0,0,0,0)",
+            shadowWidth: (_l = config.shadowWidth) !== null && _l !== void 0 ? _l : [0, 0, 0, 0],
+        };
     }
     layout() {
         for (let child of this.children) {

@@ -3,27 +3,41 @@ import { Rect } from "./Rect.js";
 export interface LayoutConfig {
   type: "stack" | "scroll";
   direction: "vertical" | "horizontal";
-  dimensions?: [number, number];
-  margin?: [number, number, number, number];
-  weight?: number;
+  dimensions: [number, number];
+  margin: [number, number, number, number];
+  weight: number;
 }
 
 export interface StyleConfig {
-  backgroundColor?: string;
-  borderColor?: string;
-  borderRadius?: [number, number, number, number];
-  borderWidth?: [number, number, number, number];
-  shadowcolor?: string;
-  shadowWidth?: [number, number, number, number];
+  backgroundColor: string;
+  borderColor: string;
+  borderRadius: [number, number, number, number];
+  borderWidth: [number, number, number, number];
+  shadowcolor: string;
+  shadowWidth: [number, number, number, number];
 }
+
+export type Config = LayoutConfig & StyleConfig;
 
 export class View {
   public frame: Rect = new Rect(0, 0, 0, 0);
+  public config: Config;
 
-  constructor(
-    public config: LayoutConfig & StyleConfig,
-    public children: View[] = []
-  ) {}
+  constructor(config: Partial<Config>, public children: View[] = []) {
+    this.config = {
+      type: config.type ?? "scroll",
+      direction: config.direction ?? "vertical",
+      dimensions: config.dimensions ?? [0, 0],
+      margin: config.margin ?? [-1, -1, -1, -1],
+      weight: config.weight ?? 1,
+      backgroundColor: config.backgroundColor ?? "rgba(0,0,0,0)",
+      borderColor: config.borderColor ?? "rgba(0,0,0,0)",
+      borderRadius: config.borderRadius ?? [0, 0, 0, 0],
+      borderWidth: config.borderWidth ?? [0, 0, 0, 0],
+      shadowcolor: config.shadowcolor ?? "rgba(0,0,0,0)",
+      shadowWidth: config.shadowWidth ?? [0, 0, 0, 0],
+    };
+  }
 
   layout(): void {
     for (let child of this.children) {
