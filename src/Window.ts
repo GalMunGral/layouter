@@ -1,1 +1,1 @@
-import { Rect } from "./Rect.js";
+import { Rect } from "./Geometry.js";

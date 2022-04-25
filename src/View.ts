@@ -1,4 +1,6 @@
-import { Rect } from "./Rect.js";
+import { Display } from "./Display.js";
+import { Event, MouseUpEvent } from "./Event.js";
+import { Rect } from "./Geometry.js";
 
 export interface LayoutConfig {
   dimensions: [number, number];
@@ -35,15 +37,18 @@ export class View {
     };
   }
 
+  handle(e: Event): void {}
+
   layout(): void {}
 
-  draw(ctx: CanvasRenderingContext2D, clip?: Rect): void {
-    const frame = this.frame;
-    clip = clip ? this.frame.intersection(clip) : this.frame;
-    if (!clip?.width || !clip.height) return;
+  draw(dirty: Rect | null = null): void {
+    const clip = this.frame.intersection(dirty);
+    if (!clip) return;
 
+    const ctx = Display.instance.ctx;
     ctx.save();
 
+    ctx.beginPath();
     ctx.rect(clip.x, clip.y, clip.width, clip.height);
     ctx.clip();
 

@@ -1,19 +1,8 @@
+import { Display } from "./Display.js";
 import { HStack } from "./HStack.js";
-import { Rect } from "./Rect.js";
 import { View } from "./View.js";
 import { VScroll } from "./VScroll.js";
 import { VStack } from "./VStack.js";
-
-function init(): CanvasRenderingContext2D {
-  document.body.style.margin = "0px";
-  const canvas = document.createElement("canvas");
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  document.body.append(canvas);
-  return canvas.getContext("2d")!;
-}
-
-const ctx = init();
 
 const test = new HStack(
   {
@@ -52,7 +41,7 @@ const test = new HStack(
     new VScroll(
       {
         weight: 4,
-        margin: [20, 20, 20, 20],
+        margin: [20, 20, 100, 20],
         backgroundColor: "blue",
       },
       Array(20)
@@ -60,12 +49,12 @@ const test = new HStack(
         .flatMap(() => [
           new View({
             backgroundColor: "#9999ff",
-            dimensions: [Infinity, 20],
+            dimensions: [Infinity, 50],
             margin: [-1, 10, -1, 10],
           }),
           new View({
             backgroundColor: "#ff9999",
-            dimensions: [Infinity, 20],
+            dimensions: [Infinity, 50],
             margin: [-1, 10, -1, 10],
           }),
         ])
@@ -73,8 +62,4 @@ const test = new HStack(
   ]
 );
 
-test.frame = new Rect(0, 0, 1000, 500);
-test.layout();
-test.draw(ctx);
-
-console.log(test);
+new Display(test).draw();

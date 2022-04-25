@@ -1,4 +1,5 @@
-import { Rect } from "./Rect.js";
+import { Display } from "./Display.js";
+import { Rect } from "./Geometry.js";
 export class View {
     constructor(config, children = []) {
         var _a, _b, _c, _d, _e, _f, _g, _h, _j;
@@ -16,14 +17,16 @@ export class View {
             shadowWidth: (_j = config.shadowWidth) !== null && _j !== void 0 ? _j : [0, 0, 0, 0],
         };
     }
+    handle(e) { }
     layout() { }
-    draw(ctx, clip) {
+    draw(dirty = null) {
         var _a;
-        const frame = this.frame;
-        clip = clip ? this.frame.intersection(clip) : this.frame;
-        if (!(clip === null || clip === void 0 ? void 0 : clip.width) || !clip.height)
+        const clip = this.frame.intersection(dirty);
+        if (!clip)
             return;
+        const ctx = Display.instance.ctx;
         ctx.save();
+        ctx.beginPath();
         ctx.rect(clip.x, clip.y, clip.width, clip.height);
         ctx.clip();
         ctx.fillStyle = (_a = this.config.backgroundColor) !== null && _a !== void 0 ? _a : "black";
