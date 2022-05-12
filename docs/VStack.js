@@ -1,6 +1,8 @@
 import { Stack } from "./Stack.js";
 export class VStack extends Stack {
     layout() {
+        if (!this.children.length)
+            return;
         this.allocateHeight();
         let y = this.frame.y;
         for (let child of this.children) {

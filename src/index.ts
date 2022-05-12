@@ -6,8 +6,10 @@ import { LayoutView } from "./View.js";
 import { VScroll } from "./VScroll.js";
 import { VStack } from "./VStack.js";
 import { initFonts } from "./Font.js";
+import { Container } from "./Container.js";
 
 initFonts([
+  { src: "fonts/PartyLET.svg", type: "svg", name: "PartyLET" },
   { src: "fonts/NotoSans.svg", type: "svg", name: "Noto Sans" },
   { src: "fonts/ComputerModern.svg", type: "svg", name: "Computer Modern" },
   { src: "fonts/Trattatello.svg", type: "svg", name: "Trattatello" },
@@ -22,14 +24,12 @@ initFonts([
       Array(size)
         .fill(0)
         .flatMap((_, i) => [
-          new Text("Noto Sans " + 2 * i, {
-            font: "Noto Sans",
+          new VStack({
             backgroundColor: "#ffcccc",
             dimension: [Infinity, 50],
             margin: [10, 10, 0, 10],
           }),
-          new Text("Computer Modern " + (2 * i + 1), {
-            font: "Computer Modern",
+          new VStack({
             backgroundColor: "#ccccff",
             dimension: [Infinity, 50],
             margin: [10, 10, 0, 10],
@@ -55,8 +55,9 @@ initFonts([
                 backgroundColor: "black",
               },
               [
-                new Text("Trattatello " + i, {
-                  font: "Trattatello",
+                new Text("Title No." + i, {
+                  font: "Computer Modern",
+                  size: 20,
                   dimension: [Infinity, 40],
                   margin: [0, 0, 0, 0],
                   backgroundColor: "white",
@@ -102,16 +103,18 @@ initFonts([
         )
     );
 
-  const fibonacciList = (width: number) => {
+  const fibonacciList = () => {
     const children = new Array<LayoutView<any>>();
+    let n = 1;
     let a = 1;
     let b = 1;
     let brightness = 0;
     while (b < 100) {
       children.push(
-        new Text(`Here is some text and the next fib number is ${b}`, {
+        new Text(`fib(${n}) = ${b}`, {
           margin: [2, 40, 2, 40],
           weight: b,
+          size: 0.25 * n ** 2,
           font: "Trattatello",
           color: `rgb(${255 - brightness}, ${255 - brightness}, ${
             255 - brightness
@@ -120,18 +123,22 @@ initFonts([
         })
       );
       [a, b] = [b, a + b];
+      ++n;
       brightness = Math.min(255, brightness + b);
     }
     return new VStack(
       {
-        dimension: [width, Infinity],
-        weight: 20,
+        dimension: [200, Infinity],
+        weight: 5,
         margin: [0, 0, 0, 0],
         backgroundColor: "#ffaaaa",
       },
       children
     );
   };
+
+  const ipsum =
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
 
   new Display(
     new HStack(
@@ -140,13 +147,36 @@ initFonts([
         backgroundColor: "black",
       },
       [
-        fibonacciList(200),
+        new VStack(
+          {
+            weight: 50,
+            margin: [0, 0, 0, 0],
+          },
+          [
+            new Text(ipsum, {
+              font: "PartyLET",
+              size: 30,
+              margin: [10, 10, 0, 10],
+            }),
+            new Text(ipsum, {
+              font: "Trattatello",
+              size: 30,
+              margin: [10, 10, 0, 10],
+            }),
+            new Text(ipsum, {
+              size: 30,
+              font: "Noto Sans",
+              margin: [10, 10, 0, 10],
+            }),
+          ]
+        ),
+        fibonacciList(),
         new VStack(
           {
             weight: 200,
             margin: [0, 0, 0, 0],
           },
-          [HList(100), VList2(10)]
+          [HList(20), VList2(10)]
         ),
       ]
     )

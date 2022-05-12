@@ -2,6 +2,7 @@ import { Stack } from "./Stack.js";
 
 export class VStack extends Stack {
   layout(): void {
+    if (!this.children.length) return;
     this.allocateHeight();
 
     let y = this.frame.y;

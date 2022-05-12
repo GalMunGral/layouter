@@ -13,8 +13,12 @@ interface StyleConfig {
 
 export class Text extends LayoutView<StyleConfig> {
   private font: Font;
+  private lines: Array<string> = [];
   private unitsPerEm: number;
   private scale: number;
+
+  // TODO: padding;
+  private padding = [2, 2, 2, 2] as const;
 
   constructor(
     public content: string,
@@ -38,16 +42,44 @@ export class Text extends LayoutView<StyleConfig> {
 
   public override handle(e: Event): void {
     if (e instanceof MouseUpEvent) {
-      console.log(
-        "[TEXT]",
-        this.content.split("").map((c) => this.font.glyphs[c])
-      );
+      // this.layoutConfig.weight++;
+      console.log(this.content.split("").map((c) => this.font.glyphs[c]));
+      e.handled = true;
     }
   }
 
   public override layout(): void {
-    // TODO: text layout
-    // TODO: kerning
+    this.lines = [];
+    const words = this.content.split(/\s/);
+
+    const lineHeight = this.styleConfig.size; // ??
+    const spaceWidth = this.styleConfig.size / 4; // ??
+    const glyphWidth = (c: string) => this.font.glyphs[c].width * this.scale;
+
+    let contentHeight = 0;
+    let line = "";
+    let lineWidth = 0;
+    for (let word of words) {
+      const wordWidth = word.split("").reduce((w, c) => w + glyphWidth(c), 0);
+      if (
+        lineWidth + wordWidth >
+        this.frame.width - this.padding[1] - this.padding[3]
+      ) {
+        if (
+          contentHeight + lineHeight >
+          this.frame.height - this.padding[0] - this.padding[2]
+        )
+          break;
+        this.lines.push(line);
+        contentHeight += lineHeight;
+        line = word;
+        lineWidth = wordWidth;
+      } else {
+        line += " " + word;
+        lineWidth += spaceWidth + wordWidth;
+      }
+    }
+    this.lines.push(line);
   }
 
   private drawGlyph(ctx: CanvasRenderingContext2D, glyph: Glyph): void {
@@ -90,18 +122,24 @@ export class Text extends LayoutView<StyleConfig> {
     const { x, y, width, height } = this.frame;
     ctx.fillRect(x, y, width, height);
 
-    ctx.translate(this.frame.x, this.frame.y);
-    ctx.scale(this.scale, this.scale);
-
     ctx.fillStyle = this.styleConfig.color;
-    for (let c of this.content) {
-      const glyph = this.font.glyphs[c];
-      if (glyph) {
-        this.drawGlyph(ctx, glyph);
-        ctx.translate(glyph.width, 0);
-      } else {
-        // TODO: spaces ?
-        ctx.translate(this.unitsPerEm / 4, 0);
+    for (let [i, line] of this.lines.entries()) {
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.translate(
+        this.frame.x + this.padding[3],
+        this.frame.y + this.padding[0] + this.styleConfig.size * i
+      );
+      ctx.scale(this.scale, this.scale);
+      for (let c of line) {
+        const glyph = this.font.glyphs[c];
+        if (glyph) {
+          // TODO: kerning
+          this.drawGlyph(ctx, glyph);
+          ctx.translate(glyph.width, 0);
+        } else {
+          // TODO: spaces ?
+          ctx.translate(this.unitsPerEm / 4, 0);
+        }
       }
     }
 

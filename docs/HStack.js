@@ -1,6 +1,8 @@
 import { Stack } from "./Stack.js";
 export class HStack extends Stack {
     layout() {
+        if (!this.children.length)
+            return;
         this.allocateWidth();
         let x = this.frame.x;
         for (let child of this.children) {
