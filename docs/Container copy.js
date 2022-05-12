@@ -1,6 +1,5 @@
-import { Display } from "./Display.js";
 import { Event, MouseClickEvent, MouseEnterEvent, MouseExitEvent, } from "./Event.js";
-import { LayoutView } from "./View.js";
+import { LayoutView } from "./LayoutView.js";
 export class Container extends LayoutView {
     constructor(config, children = []) {
         super(config);
@@ -8,17 +7,6 @@ export class Container extends LayoutView {
         for (let child of children) {
             child.parent = this;
         }
-    }
-    initStyle(config) {
-        var _a, _b, _c, _d, _e, _f;
-        return {
-            backgroundColor: (_a = config.backgroundColor) !== null && _a !== void 0 ? _a : "rgba(0,0,0,0)",
-            borderColor: (_b = config.borderColor) !== null && _b !== void 0 ? _b : "rgba(0,0,0,0)",
-            borderWidth: (_c = config.borderWidth) !== null && _c !== void 0 ? _c : [0, 0, 0, 0],
-            borderRadius: (_d = config.borderRadius) !== null && _d !== void 0 ? _d : [0, 0, 0, 0],
-            shadowcolor: (_e = config.shadowcolor) !== null && _e !== void 0 ? _e : "rgba(0,0,0,0)",
-            shadowWidth: (_f = config.shadowWidth) !== null && _f !== void 0 ? _f : [0, 0, 0, 0],
-        };
     }
     handle(e) {
         var _a, _b;
@@ -49,16 +37,7 @@ export class Container extends LayoutView {
         }
     }
     draw(dirty) {
-        var _a;
-        const ctx = Display.instance.ctx;
-        ctx.save();
-        ctx.beginPath();
-        ctx.rect(dirty.x, dirty.y, dirty.width, dirty.height);
-        ctx.clip();
-        ctx.fillStyle = (_a = this.styleConfig.backgroundColor) !== null && _a !== void 0 ? _a : "black";
-        const { x, y, width, height } = this.frame;
-        ctx.fillRect(x, y, width, height);
-        ctx.restore();
+        super.draw(dirty);
         for (let child of this.children) {
             const d = dirty.intersect(child.visible);
             if (d)

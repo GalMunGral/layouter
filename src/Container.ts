@@ -1,3 +1,4 @@
+import { Display } from "./Display.js";
 import {
   Event,
   MouseClickEvent,
@@ -5,17 +6,42 @@ import {
   MouseExitEvent,
 } from "./Event.js";
 import { Rect } from "./Geometry.js";
-import { Config, View } from "./View.js";
+import { LayoutConfig, LayoutView } from "./View.js";
 
-export class Container extends View {
-  constructor(config: Partial<Config>, public children: View[] = []) {
+export interface StyleConfig {
+  backgroundColor: string;
+  borderColor: string;
+  borderRadius: [number, number, number, number];
+  borderWidth: [number, number, number, number];
+  shadowcolor: string;
+  shadowWidth: [number, number, number, number];
+}
+
+export abstract class Container extends LayoutView<StyleConfig> {
+  constructor(
+    config: Partial<LayoutConfig & StyleConfig>,
+    public children: LayoutView<any>[] = []
+  ) {
     super(config);
     for (let child of children) {
       child.parent = this;
     }
   }
 
-  handle(e: Event): void {
+  protected initStyle(
+    config: Partial<StyleConfig & LayoutConfig>
+  ): StyleConfig {
+    return {
+      backgroundColor: config.backgroundColor ?? "rgba(0,0,0,0)",
+      borderColor: config.borderColor ?? "rgba(0,0,0,0)",
+      borderWidth: config.borderWidth ?? [0, 0, 0, 0],
+      borderRadius: config.borderRadius ?? [0, 0, 0, 0],
+      shadowcolor: config.shadowcolor ?? "rgba(0,0,0,0)",
+      shadowWidth: config.shadowWidth ?? [0, 0, 0, 0],
+    };
+  }
+
+  override handle(e: Event): void {
     for (let child of this.children) {
       if (child.frame.includes(e.point)) {
         if (!child.frame.includes(Event.previous?.point)) {
@@ -28,11 +54,10 @@ export class Container extends View {
         }
       }
     }
-    super.handle(e);
     if (e instanceof MouseClickEvent && !e.handled) {
-      this.config.weight++;
-      this.config.dimension[0]++;
-      this.config.dimension[1]++;
+      this.layoutConfig.weight++;
+      this.layoutConfig.dimension[0]++;
+      this.layoutConfig.dimension[1]++;
       e.handled = true;
     }
   }
@@ -44,8 +69,19 @@ export class Container extends View {
     }
   }
 
-  draw(dirty: Rect) {
-    super.draw(dirty);
+  override draw(dirty: Rect) {
+    const ctx = Display.instance.ctx;
+    ctx.save();
+
+    ctx.beginPath();
+    ctx.rect(dirty.x, dirty.y, dirty.width, dirty.height);
+    ctx.clip();
+
+    ctx.fillStyle = this.styleConfig.backgroundColor ?? "black";
+    const { x, y, width, height } = this.frame;
+    ctx.fillRect(x, y, width, height);
+
+    ctx.restore();
     for (let child of this.children) {
       const d = dirty.intersect(child.visible);
       if (d) child.draw(d);

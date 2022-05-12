@@ -2,7 +2,7 @@ import { Container } from "./Container.js";
 import { Event, MouseDownEvent, MouseUpEvent } from "./Event.js";
 import { Point } from "./Geometry.js";
 
-export class Scroll extends Container {
+export abstract class Scroll extends Container {
   protected offset = 0;
   protected minOffset = 0;
   protected scrolling = false;

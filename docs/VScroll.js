@@ -16,8 +16,8 @@ export class VScroll extends Scroll {
         let y = this.frame.y + this.offset;
         let contentHeight = 0;
         for (let child of this.children) {
-            let [width, height] = child.config.dimension;
-            let [top, right, bottom, left] = child.config.margin.map((x) => Math.max(0, x));
+            let [width, height] = child.layoutConfig.dimension;
+            let [top, right, bottom, left] = child.layoutConfig.margin.map((x) => Math.max(0, x));
             child.frame.x = x + left;
             child.frame.y = y + top;
             child.frame.width = Math.min(width, this.frame.width - left - right);

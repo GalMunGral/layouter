@@ -23,13 +23,13 @@ export class HStack extends Stack {
     let total = this.frame.width;
     let totalWeight = 0;
     for (let child of this.children) {
-      const config = child.config;
+      const config = child.layoutConfig;
       total -= Math.min(config.dimension[0], this.frame.width);
       totalWeight += config.weight!;
     }
     let rem = total;
     for (let child of this.children) {
-      const config = child.config;
+      const config = child.layoutConfig;
       let extra = Math.round((total * config.weight!) / totalWeight);
       rem -= extra;
       child.frame.width = config.dimension![0] + extra;

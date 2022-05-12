@@ -1,11 +1,11 @@
 import { Container } from "./Container.js";
-import { View } from "./View.js";
+import { LayoutView } from "./View.js";
 
-export class Stack extends Container {
-  protected finalize(child: View): void {
-    const { frame, config: config } = child;
-    let [width, height] = config.dimension ?? [0, 0];
-    const [top, right, bottom, left] = config.margin!;
+export abstract class Stack extends Container {
+  protected finalize(child: LayoutView<any>): void {
+    const { frame, layoutConfig } = child;
+    let [width, height] = layoutConfig.dimension ?? [0, 0];
+    const [top, right, bottom, left] = layoutConfig.margin!;
     if (top > -1 && bottom > -1) {
       frame.height = frame.height - top - bottom;
       frame.y += top;
