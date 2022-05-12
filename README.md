@@ -1,5 +1,5 @@
-# layouter
+# Michelangelo
 
-A layout experiment
+A UI experiment with only JavaScript (without DOM/CSSOM).
 
-demo: https://galmungral.github.io/layouter
+demo: https://galmungral.github.io/michelangelo
