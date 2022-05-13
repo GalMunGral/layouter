@@ -26,6 +26,17 @@ export abstract class Container extends LayoutView<StyleConfig> {
     for (let child of children) {
       child.parent = this;
     }
+    // TODO: other methods
+    const parent = this;
+    this.children.push = function (view: LayoutView<any>): number {
+      view.parent = parent;
+      Array.prototype.push.call(this, view);
+      queueMicrotask(() => {
+        parent.layout();
+        parent.redraw();
+      });
+      return this.length;
+    };
   }
 
   protected initStyle(

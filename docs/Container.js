@@ -8,6 +8,17 @@ export class Container extends LayoutView {
         for (let child of children) {
             child.parent = this;
         }
+        // TODO: other methods
+        const parent = this;
+        this.children.push = function (view) {
+            view.parent = parent;
+            Array.prototype.push.call(this, view);
+            queueMicrotask(() => {
+                parent.layout();
+                parent.redraw();
+            });
+            return this.length;
+        };
     }
     initStyle(config) {
         var _a, _b, _c, _d, _e, _f;

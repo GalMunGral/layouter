@@ -66,33 +66,44 @@ initFonts([
         margin: [10, 0, 10, 10],
         backgroundColor: "#ffeeee",
     }, [VList(size)])))));
-    const fibonacciList = () => {
-        const children = new Array();
-        let n = 1;
-        let a = 1;
-        let b = 1;
-        let brightness = 0;
-        while (b < 100) {
-            children.push(new Text(`the ${n}-th fibonacci number is ${b}`, {
-                margin: [2, 40, 2, 40],
-                weight: b,
-                size: 0.25 * n ** 2,
-                font: "Noto Sans",
-                color: `rgb(${255 - brightness}, ${255 - brightness}, ${255 - brightness})`,
-                backgroundColor: `rgb(${brightness}, ${brightness}, ${brightness})`,
-            }));
-            [a, b] = [b, a + b];
-            ++n;
-            brightness = Math.min(255, brightness + b);
-        }
-        return new VStack({
-            dimension: [200, Infinity],
-            weight: 5,
-            margin: [0, 0, 0, 0],
-            backgroundColor: "#ffaaaa",
-        }, children);
-    };
     const ipsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+    class FancyText extends Text {
+        constructor(content, config) {
+            super(content, config);
+            let i = 0;
+            setInterval(() => {
+                i++;
+                this.styleConfig.color = `rgb(${Math.sin(0.05 * i) * 256}, ${Math.sin(0.06 * i) * 256}, ${Math.sin(0.07 * i) * 256})`;
+            }, 16);
+        }
+    }
+    class FibVStack extends VStack {
+        constructor(config, children = []) {
+            super(config, children);
+            this.init();
+        }
+        init() {
+            let n = 1;
+            let a = 1;
+            let b = 1;
+            let brightness = 0;
+            let timer = setInterval(() => {
+                this.children.push(new Text(`the ${n}-th fibonacci number is ${b}`, {
+                    margin: [2, 40, 2, 40],
+                    weight: b,
+                    size: 0.01 * n,
+                    font: "Noto Sans",
+                    color: `rgb(${255 - brightness}, ${255 - brightness}, ${255 - brightness})`,
+                    backgroundColor: `rgb(${brightness}, ${brightness}, ${brightness})`,
+                }));
+                [a, b] = [b, a + b];
+                ++n;
+                brightness = Math.min(255, brightness + b);
+                if (b > 100)
+                    clearInterval(timer);
+            }, 100);
+        }
+    }
     new Display(new HStack({
         dimension: [10, 10],
         backgroundColor: "black",
@@ -101,7 +112,7 @@ initFonts([
             weight: 50,
             margin: [0, 0, 0, 0],
         }, [
-            new Text(ipsum, {
+            new FancyText(ipsum, {
                 font: "PartyLET",
                 size: 30,
                 margin: [10, 10, 0, 10],
@@ -117,7 +128,12 @@ initFonts([
                 margin: [10, 10, 0, 10],
             }),
         ]),
-        fibonacciList(),
+        new FibVStack({
+            dimension: [200, Infinity],
+            weight: 5,
+            margin: [0, 0, 0, 0],
+            backgroundColor: "#ffaaaa",
+        }),
         new VStack({
             weight: 200,
             margin: [0, 0, 0, 0],

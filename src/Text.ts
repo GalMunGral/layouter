@@ -4,7 +4,7 @@ import { Font, Fonts, Glyph } from "./Font.js";
 import { Rect } from "./Geometry.js";
 import { LayoutConfig, LayoutView } from "./View.js";
 
-interface StyleConfig {
+export interface StyleConfig {
   color: string;
   padding: [number, number, number, number];
   backgroundColor: string;
