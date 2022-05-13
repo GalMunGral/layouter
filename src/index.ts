@@ -6,7 +6,6 @@ import { LayoutView } from "./View.js";
 import { VScroll } from "./VScroll.js";
 import { VStack } from "./VStack.js";
 import { initFonts } from "./Font.js";
-import { Container } from "./Container.js";
 
 initFonts([
   { src: "fonts/PartyLET.svg", type: "svg", name: "PartyLET" },
@@ -55,9 +54,8 @@ initFonts([
                 backgroundColor: "black",
               },
               [
-                new Text("Title No." + i, {
+                new Text("Computer Modern " + i, {
                   font: "Computer Modern",
-                  size: 20,
                   dimension: [Infinity, 40],
                   margin: [0, 0, 0, 0],
                   backgroundColor: "white",
@@ -111,11 +109,11 @@ initFonts([
     let brightness = 0;
     while (b < 100) {
       children.push(
-        new Text(`fib(${n}) = ${b}`, {
+        new Text(`the ${n}-th fibonacci number is ${b}`, {
           margin: [2, 40, 2, 40],
           weight: b,
           size: 0.25 * n ** 2,
-          font: "Trattatello",
+          font: "Noto Sans",
           color: `rgb(${255 - brightness}, ${255 - brightness}, ${
             255 - brightness
           })`,

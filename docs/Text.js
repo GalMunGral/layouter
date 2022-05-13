@@ -7,47 +7,51 @@ export class Text extends LayoutView {
         super(config);
         this.content = content;
         this.lines = [];
-        // TODO: padding;
-        this.padding = [2, 2, 2, 2];
         this.font = Fonts.get(this.styleConfig.font);
         this.unitsPerEm = this.font.unitsPerEm;
         this.styleConfig.size;
         this.scale = this.styleConfig.size / this.unitsPerEm;
     }
+    get contentWidth() {
+        return (this.frame.width -
+            this.styleConfig.padding[1] -
+            this.styleConfig.padding[3]);
+    }
+    get contentHeight() {
+        return (this.frame.height -
+            this.styleConfig.padding[0] -
+            this.styleConfig.padding[2]);
+    }
     initStyle(config) {
-        var _a, _b, _c;
+        var _a, _b, _c, _d;
         return {
             color: (_a = config.color) !== null && _a !== void 0 ? _a : "black",
-            backgroundColor: (_b = config.backgroundColor) !== null && _b !== void 0 ? _b : "white",
-            font: (_c = config.font) !== null && _c !== void 0 ? _c : "Computer Modern",
+            padding: (_b = config.padding) !== null && _b !== void 0 ? _b : [4, 4, 4, 4],
+            backgroundColor: (_c = config.backgroundColor) !== null && _c !== void 0 ? _c : "white",
+            font: (_d = config.font) !== null && _d !== void 0 ? _d : "Computer Modern",
             size: config.size || 16,
         };
     }
     handle(e) {
         if (e instanceof MouseUpEvent) {
-            // this.layoutConfig.weight++;
             console.log(this.content.split("").map((c) => this.font.glyphs[c]));
             e.handled = true;
         }
     }
     layout() {
         this.lines = [];
-        const words = this.content.split(/\s/);
-        const lineHeight = this.styleConfig.size; // ??
-        const spaceWidth = this.styleConfig.size / 4; // ??
-        const glyphWidth = (c) => this.font.glyphs[c].width * this.scale;
-        let contentHeight = 0;
-        let line = "";
-        let lineWidth = 0;
+        const words = this.content.split(/\s+/);
+        if (!words.length)
+            return;
+        const spaceWidth = this.styleConfig.size / 4;
+        const getGlyphWidth = (c) => this.font.glyphs[c].width * this.scale;
+        const getWordWidth = (word) => word.split("").reduce((w, c) => w + getGlyphWidth(c), 0);
+        let line = words.shift();
+        let lineWidth = getWordWidth(line);
         for (let word of words) {
-            const wordWidth = word.split("").reduce((w, c) => w + glyphWidth(c), 0);
-            if (lineWidth + wordWidth >
-                this.frame.width - this.padding[1] - this.padding[3]) {
-                if (contentHeight + lineHeight >
-                    this.frame.height - this.padding[0] - this.padding[2])
-                    break;
+            const wordWidth = getWordWidth(word);
+            if (lineWidth + spaceWidth + wordWidth > this.contentWidth) {
                 this.lines.push(line);
-                contentHeight += lineHeight;
                 line = word;
                 lineWidth = wordWidth;
             }
@@ -82,8 +86,6 @@ export class Text extends LayoutView {
     }
     draw(dirty) {
         var _a;
-        if (!this.font)
-            return;
         const ctx = Display.instance.ctx;
         ctx.save();
         ctx.beginPath();
@@ -94,8 +96,10 @@ export class Text extends LayoutView {
         ctx.fillRect(x, y, width, height);
         ctx.fillStyle = this.styleConfig.color;
         for (let [i, line] of this.lines.entries()) {
+            if (this.styleConfig.size * (i + 1) > this.contentHeight)
+                break;
             ctx.setTransform(1, 0, 0, 1, 0, 0);
-            ctx.translate(this.frame.x + this.padding[3], this.frame.y + this.padding[0] + this.styleConfig.size * i);
+            ctx.translate(this.frame.x + this.styleConfig.padding[3], this.frame.y + this.styleConfig.padding[0] + this.styleConfig.size * i);
             ctx.scale(this.scale, this.scale);
             for (let c of line) {
                 const glyph = this.font.glyphs[c];

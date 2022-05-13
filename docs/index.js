@@ -40,9 +40,8 @@ initFonts([
         margin: [10, 0, 10, 10],
         backgroundColor: "black",
     }, [
-        new Text("Title No." + i, {
+        new Text("Computer Modern " + i, {
             font: "Computer Modern",
-            size: 20,
             dimension: [Infinity, 40],
             margin: [0, 0, 0, 0],
             backgroundColor: "white",
@@ -74,11 +73,11 @@ initFonts([
         let b = 1;
         let brightness = 0;
         while (b < 100) {
-            children.push(new Text(`fib(${n}) = ${b}`, {
+            children.push(new Text(`the ${n}-th fibonacci number is ${b}`, {
                 margin: [2, 40, 2, 40],
                 weight: b,
                 size: 0.25 * n ** 2,
-                font: "Trattatello",
+                font: "Noto Sans",
                 color: `rgb(${255 - brightness}, ${255 - brightness}, ${255 - brightness})`,
                 backgroundColor: `rgb(${brightness}, ${brightness}, ${brightness})`,
             }));
