@@ -16,8 +16,8 @@ export class HScroll extends Scroll {
         let y = this.frame.y;
         let contentWidth = 0;
         for (let child of this.children) {
-            let [width, height] = child.layoutConfig.dimension;
-            let [top, right, bottom, left] = child.layoutConfig.margin.map((x) => Math.max(0, x));
+            let [width, height] = child.props.dimension;
+            let [top, right, bottom, left] = child.props.margin.map((x) => Math.max(0, x));
             child.frame.x = x + left;
             child.frame.y = y + top;
             child.frame.width = width - left - right;

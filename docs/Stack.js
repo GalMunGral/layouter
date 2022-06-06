@@ -1,10 +1,9 @@
 import { Container } from "./Container.js";
 export class Stack extends Container {
     finalize(child) {
-        var _a;
-        const { frame, layoutConfig } = child;
-        let [width, height] = (_a = layoutConfig.dimension) !== null && _a !== void 0 ? _a : [0, 0];
-        const [top, right, bottom, left] = layoutConfig.margin;
+        const { frame, props } = child;
+        let [width, height] = props.dimension;
+        const [top, right, bottom, left] = props.margin;
         if (top > -1 && bottom > -1) {
             frame.height = frame.height - top - bottom;
             frame.y += top;

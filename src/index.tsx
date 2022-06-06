@@ -2,10 +2,11 @@ import { Display } from "./Display.js";
 import { HScroll } from "./HScroll.js";
 import { HStack } from "./HStack.js";
 import { Text, StyleConfig } from "./Text.js";
-import { LayoutConfig, LayoutView } from "./View.js";
 import { VScroll } from "./VScroll.js";
 import { VStack } from "./VStack.js";
 import { initFonts } from "./Font.js";
+import { ViewConfig } from "./View.js";
+import { Observable } from "./Observable.js";
 
 function Test<T>(type: new (p: T) => any, props: T, ...children: any[]) {
   return new type({ ...props, children });
@@ -109,20 +110,26 @@ initFonts([
     "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
 
   class FancyText extends Text {
-    constructor(config: Partial<LayoutConfig<string> & StyleConfig>) {
-      super(config);
-      let i = 0;
-      setInterval(() => {
-        i++;
-        this.styleConfig.color = `rgb(${Math.sin(0.05 * i) * 256}, ${
-          Math.sin(0.06 * i) * 256
-        }, ${Math.sin(0.07 * i) * 256})`;
-      }, 16);
+    constructor(config: ViewConfig) {
+      super({
+        ...config,
+        color: new Observable((f) => {
+          let i = 0;
+          setInterval(() => {
+            i++;
+            f(
+              `rgb(${Math.sin(0.05 * i) * 256}, ${Math.sin(0.06 * i) * 256}, ${
+                Math.sin(0.07 * i) * 256
+              })`
+            );
+          }, 16);
+        }),
+      });
     }
   }
 
   class FibVStack extends VStack {
-    constructor(config: Partial<LayoutConfig & StyleConfig>) {
+    constructor(config: ViewConfig) {
       super(config);
       this.init();
     }

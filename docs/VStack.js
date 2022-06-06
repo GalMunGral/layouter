@@ -20,16 +20,16 @@ export class VStack extends Stack {
         let total = this.frame.height;
         let totalWeight = 0;
         for (let child of this.children) {
-            const config = child.layoutConfig;
-            total -= Math.min(config.dimension[1], this.frame.height);
-            totalWeight += config.weight;
+            const props = child.props;
+            total -= Math.min(props.dimension[1], this.frame.height);
+            totalWeight += props.weight;
         }
         let rem = total;
         for (let child of this.children) {
-            const config = child.layoutConfig;
-            let extra = Math.round((total * config.weight) / totalWeight);
+            const props = child.props;
+            let extra = Math.round((total * props.weight) / totalWeight);
             rem -= extra;
-            child.frame.height = config.dimension[1] + extra;
+            child.frame.height = props.dimension[1] + extra;
         }
         if (rem) {
             this.children[this.children.length - 1].frame.height += rem;

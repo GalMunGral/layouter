@@ -1,53 +1,35 @@
 import { Display } from "./Display.js";
-import { MouseUpEvent } from "./Event.js";
 import { Fonts } from "./Font.js";
-import { LayoutView } from "./View.js";
-export class Text extends LayoutView {
+import { View } from "./View.js";
+import { MouseUpEvent } from "./Event.js";
+export class Text extends View {
     constructor(config) {
         super(config);
         this.lines = [];
-        this.font = Fonts.get(this.styleConfig.font);
+        this.content = this.children.join("");
+        this.font = Fonts.get(this.props.font);
         this.unitsPerEm = this.font.unitsPerEm;
-        this.styleConfig.size;
-        this.scale = this.styleConfig.size / this.unitsPerEm;
+        this.props.size;
+        this.scale = this.props.size / this.unitsPerEm;
     }
     get contentWidth() {
-        return (this.frame.width -
-            this.styleConfig.padding[1] -
-            this.styleConfig.padding[3]);
+        return this.frame.width - this.props.padding[1] - this.props.padding[3];
     }
     get contentHeight() {
-        return (this.frame.height -
-            this.styleConfig.padding[0] -
-            this.styleConfig.padding[2]);
-    }
-    initStyle(config) {
-        var _a, _b, _c, _d;
-        return {
-            color: (_a = config.color) !== null && _a !== void 0 ? _a : "black",
-            padding: (_b = config.padding) !== null && _b !== void 0 ? _b : [4, 4, 4, 4],
-            backgroundColor: (_c = config.backgroundColor) !== null && _c !== void 0 ? _c : "white",
-            font: (_d = config.font) !== null && _d !== void 0 ? _d : "Computer Modern",
-            size: config.size || 16,
-        };
+        return this.frame.height - this.props.padding[0] - this.props.padding[2];
     }
     handle(e) {
         if (e instanceof MouseUpEvent) {
-            console.log(this.layoutConfig.children
-                .join("")
-                .split("")
-                .map((c) => this.font.glyphs[c]));
+            console.log(this.content.split("").map((c) => this.font.glyphs[c]));
             e.handled = true;
         }
     }
     layout() {
         this.lines = [];
-        const words = this.layoutConfig.children
-            .join("")
-            .split(/\s+/);
+        const words = this.content.split(/\s+/);
         if (!words.length)
             return;
-        const spaceWidth = this.styleConfig.size / 4;
+        const spaceWidth = this.props.size / 4;
         const getGlyphWidth = (c) => this.font.glyphs[c].width * this.scale;
         const getWordWidth = (word) => word.split("").reduce((w, c) => w + getGlyphWidth(c), 0);
         let line = words.shift();
@@ -89,21 +71,20 @@ export class Text extends LayoutView {
         ctx.fill();
     }
     draw(dirty) {
-        var _a;
         const ctx = Display.instance.ctx;
         ctx.save();
         ctx.beginPath();
         ctx.rect(dirty.x, dirty.y, dirty.width, dirty.height);
         ctx.clip();
-        ctx.fillStyle = (_a = this.styleConfig.backgroundColor) !== null && _a !== void 0 ? _a : "black";
+        ctx.fillStyle = this.props.backgroundColor;
         const { x, y, width, height } = this.frame;
         ctx.fillRect(x, y, width, height);
-        ctx.fillStyle = this.styleConfig.color;
+        ctx.fillStyle = this.props.color;
         for (let [i, line] of this.lines.entries()) {
-            if (this.styleConfig.size * (i + 1) > this.contentHeight)
+            if (this.props.size * (i + 1) > this.contentHeight)
                 break;
             ctx.setTransform(1, 0, 0, 1, 0, 0);
-            ctx.translate(this.frame.x + this.styleConfig.padding[3], this.frame.y + this.styleConfig.padding[0] + this.styleConfig.size * i);
+            ctx.translate(this.frame.x + this.props.padding[3], this.frame.y + this.props.padding[0] + this.props.size * i);
             ctx.scale(this.scale, this.scale);
             for (let c of line) {
                 const glyph = this.font.glyphs[c];

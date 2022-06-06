@@ -5,6 +5,7 @@ import { Text } from "./Text.js";
 import { VScroll } from "./VScroll.js";
 import { VStack } from "./VStack.js";
 import { initFonts } from "./Font.js";
+import { Observable } from "./Observable.js";
 function Test(type, props, ...children) {
     return new type(Object.assign(Object.assign({}, props), { children }));
 }
@@ -55,12 +56,13 @@ initFonts([
     const ipsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
     class FancyText extends Text {
         constructor(config) {
-            super(config);
-            let i = 0;
-            setInterval(() => {
-                i++;
-                this.styleConfig.color = `rgb(${Math.sin(0.05 * i) * 256}, ${Math.sin(0.06 * i) * 256}, ${Math.sin(0.07 * i) * 256})`;
-            }, 16);
+            super(Object.assign(Object.assign({}, config), { color: new Observable((f) => {
+                    let i = 0;
+                    setInterval(() => {
+                        i++;
+                        f(`rgb(${Math.sin(0.05 * i) * 256}, ${Math.sin(0.06 * i) * 256}, ${Math.sin(0.07 * i) * 256})`);
+                    }, 16);
+                }) }));
         }
     }
     class FibVStack extends VStack {

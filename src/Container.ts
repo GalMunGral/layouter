@@ -1,55 +1,21 @@
 import { Display } from "./Display.js";
+import { Rect } from "./Geometry.js";
+import { View, ViewConfig } from "./View.js";
 import {
   Event,
   MouseClickEvent,
   MouseEnterEvent,
   MouseExitEvent,
 } from "./Event.js";
-import { Rect } from "./Geometry.js";
-import { LayoutConfig, LayoutView } from "./View.js";
 
-export interface StyleConfig {
-  backgroundColor: string;
-  borderColor: string;
-  borderRadius: [number, number, number, number];
-  borderWidth: [number, number, number, number];
-  shadowcolor: string;
-  shadowWidth: [number, number, number, number];
-}
+export interface StyleConfig {}
 
-export abstract class Container extends LayoutView<StyleConfig> {
-  public children: Array<LayoutView<any>> = [];
-  constructor(config: Partial<LayoutConfig & StyleConfig>) {
+export abstract class Container extends View<View> {
+  constructor(config: ViewConfig<View>) {
     super(config);
-    if (config.children)
-      for (let child of config.children) {
-        child.parent = this;
-      }
-    // TODO: other methods
-    const parent = this;
-
-    this.children = this.layoutConfig.children;
-
-    this.children.push = function (view: LayoutView<any>): number {
-      view.parent = parent;
-      Array.prototype.push.call(this, view);
-      queueMicrotask(() => {
-        parent.layout();
-        parent.redraw();
-      });
-      return this.length;
-    };
-  }
-
-  public initStyle(config: Partial<StyleConfig & LayoutConfig>): StyleConfig {
-    return {
-      backgroundColor: config.backgroundColor ?? "rgba(0,0,0,0)",
-      borderColor: config.borderColor ?? "rgba(0,0,0,0)",
-      borderWidth: config.borderWidth ?? [0, 0, 0, 0],
-      borderRadius: config.borderRadius ?? [0, 0, 0, 0],
-      shadowcolor: config.shadowcolor ?? "rgba(0,0,0,0)",
-      shadowWidth: config.shadowWidth ?? [0, 0, 0, 0],
-    };
+    for (let child of this.children) {
+      child.parent = this;
+    }
   }
 
   override handle(e: Event): void {
@@ -66,9 +32,9 @@ export abstract class Container extends LayoutView<StyleConfig> {
       }
     }
     if (e instanceof MouseClickEvent && !e.handled) {
-      this.layoutConfig.weight++;
-      this.layoutConfig.dimension[0]++;
-      this.layoutConfig.dimension[1]++;
+      this.props.weight++;
+      this.props.dimension[0]++;
+      this.props.dimension[1]++;
       e.handled = true;
     }
   }
@@ -88,7 +54,7 @@ export abstract class Container extends LayoutView<StyleConfig> {
     ctx.rect(dirty.x, dirty.y, dirty.width, dirty.height);
     ctx.clip();
 
-    ctx.fillStyle = this.styleConfig.backgroundColor ?? "black";
+    ctx.fillStyle = this.props.backgroundColor;
     const { x, y, width, height } = this.frame;
     ctx.fillRect(x, y, width, height);
 
