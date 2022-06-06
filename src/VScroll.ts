@@ -1,7 +1,7 @@
 import { Event, MouseMoveEvent } from "./Event.js";
 import { Scroll } from "./Scroll.js";
 
-export class VScroll extends Scroll {
+export class VScroll<T extends { id: string }> extends Scroll<T> {
   handle(e: Event): void {
     super.handle(e);
     if (e instanceof MouseMoveEvent) {

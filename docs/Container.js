@@ -42,7 +42,7 @@ export class Container extends View {
         ctx.beginPath();
         ctx.rect(dirty.x, dirty.y, dirty.width, dirty.height);
         ctx.clip();
-        ctx.fillStyle = this.props.backgroundColor;
+        ctx.fillStyle = "rgba(" + this.props.backgroundColor.join(",") + ")";
         const { x, y, width, height } = this.frame;
         ctx.fillRect(x, y, width, height);
         ctx.restore();
@@ -51,5 +51,8 @@ export class Container extends View {
             if (d)
                 child.draw(d);
         }
+    }
+    destruct() {
+        this.children.forEach((c) => c.destruct());
     }
 }

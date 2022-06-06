@@ -1,21 +1,26 @@
+import { Display } from "./Display.js";
 import { Event } from "./Event.js";
 import { Rect } from "./Geometry.js";
 import { Observable } from "./Observable.js";
+import { Scroll } from "./Scroll.js";
+
+export type vec4 = [number, number, number, number];
+export type vec2 = [number, number];
 
 export type ViewProps<C> = {
-  dimension: [number, number];
-  margin: [number, number, number, number];
+  dimension: vec2;
+  margin: vec4;
   weight: number;
-  backgroundColor: string;
-  borderColor: string;
-  borderRadius: [number, number, number, number];
-  borderWidth: [number, number, number, number];
-  shadowcolor: string;
-  shadowWidth: [number, number, number, number];
-  padding: [number, number, number, number];
+  backgroundColor: vec4;
+  borderColor: vec4;
+  borderRadius: vec4;
+  borderWidth: vec4;
+  shadowcolor: vec4;
+  shadowWidth: vec4;
+  padding: vec4;
   font: string;
   size: number;
-  color: string;
+  color: vec4;
 };
 
 export type ViewConfig<C = any> = Partial<{
@@ -30,18 +35,18 @@ export abstract class View<C = any> {
 
   private _props: ViewProps<C> = {
     dimension: [0, 0],
-    margin: [-1, -1, -1, -1],
+    margin: [0, 0, 0, 0],
     weight: 1,
-    backgroundColor: "rgba(0,0,0,0)",
-    borderColor: "rgba(0,0,0,0)",
-    shadowcolor: "rgba(0,0,0,0)",
+    backgroundColor: [0, 0, 0, 0],
+    borderColor: [0, 0, 0, 0],
+    shadowcolor: [0, 0, 0, 0],
     borderWidth: [0, 0, 0, 0],
     borderRadius: [0, 0, 0, 0],
     shadowWidth: [0, 0, 0, 0],
     padding: [4, 4, 4, 4],
     font: "Computer Modern",
     size: 16,
-    color: "black",
+    color: [0, 0, 0, 1],
   };
 
   constructor(config: ViewConfig<C>) {
@@ -52,7 +57,6 @@ export abstract class View<C = any> {
     for (let key of Object.keys(config) as Array<keyof ViewProps<C>>) {
       const init = config[key];
       if (init instanceof Observable) {
-        (this._props[key] as any) = init;
         init.subscribe((v) => {
           (this.props[key] as any) = v;
         });
@@ -70,10 +74,21 @@ export abstract class View<C = any> {
         try {
           return Reflect.set(target, prop, value, receiver);
         } finally {
-          if (prop == "dimension" || prop == "margin" || prop == "weight") {
-            view.parent?.layout();
+          if (view) {
+            if (prop == "dimension" || prop == "margin" || prop == "weight") {
+              let cur: View = view;
+              const root = Display.instance.root;
+              while (cur != root && !(cur instanceof Scroll)) cur = cur.parent!;
+              queueMicrotask(() => {
+                cur.layout();
+                cur.redraw();
+              });
+            } else {
+              queueMicrotask(() => {
+                view.redraw();
+              });
+            }
           }
-          view.parent?.redraw();
         }
       },
     });
@@ -84,7 +99,8 @@ export abstract class View<C = any> {
   public abstract handle(e: Event): void;
   public redraw(): void {
     if (this.visible) {
-      this.draw(this.visible);
+      Display.instance.root.draw(this.visible);
     }
   }
+  public destruct(): void {}
 }

@@ -19,12 +19,15 @@ initFonts([
         constructor({ size }) {
             super({ weight: 100, margin: [20, 20, 20, 20] });
             this.children = [
-                Test(VScroll, { margin: [0, 0, 0, 0], backgroundColor: "gray" }, ...Array(size)
-                    .fill(0)
-                    .flatMap(() => [
-                    Test(VStack, { backgroundColor: "#ffcccc", dimension: [Infinity, 50], margin: [10, 10, 0, 10] }),
-                    Test(VStack, { backgroundColor: "#ccccff", dimension: [Infinity, 50], margin: [10, 10, 0, 10] }),
-                ])),
+                Test(VScroll, { margin: [0, 0, 0, 0], backgroundColor: [128, 128, 128, 1], data: Array(size)
+                        .fill(0)
+                        .flatMap((_, i) => [
+                        { id: String(2 * i), color: [255, 204, 204, 1] },
+                        {
+                            id: String(2 * i + 1),
+                            color: [204, 204, 255, 1],
+                        },
+                    ]), renderItem: (item) => (Test(VStack, { backgroundColor: item.color, dimension: [Infinity, 50], margin: [10, 10, 0, 10] })) }),
             ];
         }
     }
@@ -32,11 +35,11 @@ initFonts([
         constructor({ size }) {
             super({ margin: [0, 0, 0, 0], weight: 100 });
             this.children = [
-                Test(HScroll, { margin: [0, 0, 0, 0], backgroundColor: "gray" }, ...Array(size)
-                    .fill(0)
-                    .map((_, i) => (Test(VStack, { dimension: [200, Infinity], margin: [10, 0, 10, 10], backgroundColor: "black" },
-                    Test(Text, { font: "Computer Modern", dimension: [Infinity, 40], margin: [0, 0, 0, 0], backgroundColor: "white", weight: 0 }, "Computer Modern " + i),
-                    Test(VList, { size: size }))))),
+                Test(HScroll, { margin: [0, 0, 0, 0], backgroundColor: [128, 128, 128, 1], data: Array(size)
+                        .fill(0)
+                        .map((_, i) => ({ id: String(i) })), renderItem: (i) => (Test(VStack, { dimension: [200, Infinity], margin: [10, 0, 10, 10], backgroundColor: [0, 0, 0, 1] },
+                        Test(Text, { font: "Computer Modern", dimension: [Infinity, 40], margin: [0, 0, 0, 0], backgroundColor: [255, 255, 255, 1], weight: 0 }, "Computer Modern " + i.id),
+                        Test(VList, { size: size }))) }),
             ];
         }
     }
@@ -44,12 +47,12 @@ initFonts([
         constructor({ size }) {
             super({ weight: 200, margin: [0, 0, 0, 0] });
             this.children = [
-                Test(VScroll, { margin: [0, 0, 0, 0], backgroundColor: "gray" }, ...Array(size)
-                    .fill(0)
-                    .map((_) => (Test(HScroll, { dimension: [Infinity, 300], margin: [10, 10, 10, 10], backgroundColor: "#dddddd" }, ...Array(100)
-                    .fill(0)
-                    .map((_, i) => (Test(VStack, { dimension: [400, Infinity], margin: [10, 0, 10, 10], backgroundColor: "#ffeeee" },
-                    Test(VList, { size: size })))))))),
+                Test(VScroll, { margin: [0, 0, 0, 0], backgroundColor: [128, 128, 128, 1], data: Array(size)
+                        .fill(0)
+                        .map((_, i) => ({ id: String(i) })), renderItem: () => (Test(HScroll, { dimension: [Infinity, 300], margin: [10, 10, 10, 10], backgroundColor: [187, 187, 187, 1], data: Array(100)
+                            .fill(0)
+                            .map((_, i) => ({ id: String(i) })), renderItem: () => (Test(VStack, { dimension: [400, Infinity], margin: [10, 0, 10, 10], backgroundColor: [255, 238, 238, 1] },
+                            Test(VList, { size: size }))) })) }),
             ];
         }
     }
@@ -60,41 +63,50 @@ initFonts([
                     let i = 0;
                     setInterval(() => {
                         i++;
-                        f(`rgb(${Math.sin(0.05 * i) * 256}, ${Math.sin(0.06 * i) * 256}, ${Math.sin(0.07 * i) * 256})`);
+                        f([
+                            Math.sin(0.05 * i) * 256,
+                            Math.sin(0.06 * i) * 256,
+                            Math.sin(0.07 * i) * 256,
+                            1,
+                        ]);
                     }, 16);
                 }) }));
         }
     }
     class FibVStack extends VStack {
-        constructor(config) {
-            super(config);
-            this.init();
-        }
-        init() {
-            let n = 1;
-            let a = 1;
-            let b = 1;
-            let brightness = 0;
-            let timer = setInterval(() => {
-                this.children.push(Test(Text, { margin: [2, 40, 2, 40], weight: b, size: 0.01 * n, font: "Noto Sans", color: `rgb(${255 - brightness}, ${255 - brightness}, ${255 - brightness}`, backgroundColor: `rgb(${brightness}, ${brightness}, ${brightness})` },
-                    "the ",
-                    n,
-                    "-th fibonacci number is ",
-                    b));
-                [a, b] = [b, a + b];
-                ++n;
-                brightness = Math.min(255, brightness + b);
-                if (b > 100)
-                    clearInterval(timer);
-            }, 100);
+        constructor() {
+            super(...arguments);
+            this.children = [
+                Test(VScroll, { data: new Observable((f) => {
+                        let n = 1;
+                        let a = 1;
+                        let b = 1;
+                        let brightness = 0;
+                        let data = [];
+                        let timer = setInterval(() => {
+                            f((data = [
+                                ...data,
+                                { id: String(data.length), n: b, brightness },
+                            ]));
+                            [a, b] = [b, a + b];
+                            brightness = Math.min(255, brightness + 4 * n * n);
+                            if (n > 50)
+                                clearInterval(timer);
+                        }, 100);
+                    }), renderItem: ({ n, brightness }) => (Test(Text, { margin: [4, 40, 4, 40], dimension: [Infinity, Math.sqrt(n)], 
+                        // size={Math.sqrt(n) - 10}
+                        font: "Noto Sans", color: [255 - brightness, 255 - brightness, 255 - brightness, 1], backgroundColor: [brightness, brightness, brightness, 1] },
+                        "fibonacci number is ",
+                        n)) }),
+            ];
         }
     }
-    new Display((Test(HStack, { dimension: [10, 10], backgroundColor: "black" },
+    new Display((Test(HStack, { dimension: [10, 10], backgroundColor: [0, 0, 0, 1] },
         Test(VStack, { weight: 50, margin: [0, 0, 0, 0] },
             Test(FancyText, { font: "PartyLET", size: 30, margin: [10, 10, 0, 10] }, ipsum),
-            Test(Text, { font: "Trattatello", size: 30, margin: [10, 10, 0, 10] }, ipsum),
-            Test(Text, { font: "Noto Sans", size: 30, margin: [10, 10, 0, 10] }, ipsum)),
-        Test(FibVStack, { dimension: [200, Infinity], weight: 5, margin: [0, 0, 0, 0], backgroundColor: "#ffaaaa" }),
+            Test(Text, { font: "Trattatello", size: 30, margin: [10, 10, 0, 10], backgroundColor: [255, 255, 255, 1] }, ipsum),
+            Test(Text, { font: "Noto Sans", size: 30, margin: [10, 10, 0, 10], backgroundColor: [255, 255, 255, 1] }, ipsum)),
+        Test(FibVStack, { dimension: [200, Infinity], weight: 5, margin: [0, 0, 0, 0], backgroundColor: [255, 170, 170, 1] }),
         Test(VStack, { weight: 200, margin: [0, 0, 0, 0] },
             Test(HList, { size: 20 }),
             Test(VList2, { size: 10 })))));

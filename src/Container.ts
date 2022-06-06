@@ -54,7 +54,7 @@ export abstract class Container extends View<View> {
     ctx.rect(dirty.x, dirty.y, dirty.width, dirty.height);
     ctx.clip();
 
-    ctx.fillStyle = this.props.backgroundColor;
+    ctx.fillStyle = "rgba(" + this.props.backgroundColor.join(",") + ")";
     const { x, y, width, height } = this.frame;
     ctx.fillRect(x, y, width, height);
 
@@ -64,5 +64,9 @@ export abstract class Container extends View<View> {
       const d = dirty.intersect(child.visible);
       if (d) child.draw(d);
     }
+  }
+
+  public override destruct(): void {
+    this.children.forEach((c) => c.destruct());
   }
 }

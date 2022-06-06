@@ -19,7 +19,6 @@ export class Display {
     document.body.style.margin = "0px";
     document.body.append(this.canvas);
     this.render();
-    console.log(this.root);
   }
 
   render() {

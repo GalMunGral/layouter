@@ -98,11 +98,11 @@ export class Text extends View<string> {
     ctx.rect(dirty.x, dirty.y, dirty.width, dirty.height);
     ctx.clip();
 
-    ctx.fillStyle = this.props.backgroundColor;
+    ctx.fillStyle = "rgba(" + this.props.backgroundColor.join(",") + ")";
     const { x, y, width, height } = this.frame;
     ctx.fillRect(x, y, width, height);
 
-    ctx.fillStyle = this.props.color;
+    ctx.fillStyle = "rgba(" + this.props.color.join(",") + ")";
     for (let [i, line] of this.lines.entries()) {
       if (this.props.size * (i + 1) > this.contentHeight) break;
       ctx.setTransform(1, 0, 0, 1, 0, 0);
