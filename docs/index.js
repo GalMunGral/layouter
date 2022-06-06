@@ -100,7 +100,7 @@ initFonts([
             ];
         }
     }
-    new Display((Test(VStack, null,
+    new Display((Test(VStack, { backgroundColor: [255, 255, 255, 1] },
         Test(VStack, { backgroundColor: [255, 0, 0, 1], margin: [-1, -1, -1, -1], dimension: [300, 300], shadowColor: [0, 0, 0, 1], shadowWidth: [20, 20, 20, 20] }))));
     //   new Display(
     //     (

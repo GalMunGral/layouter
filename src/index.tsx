@@ -192,7 +192,7 @@ initFonts([
 
   new Display(
     (
-      <VStack>
+      <VStack backgroundColor={[255, 255, 255, 1]}>
         <VStack
           backgroundColor={[255, 0, 0, 1]}
           margin={[-1, -1, -1, -1]}
