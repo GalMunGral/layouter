@@ -12,16 +12,13 @@ export interface StyleConfig {
   size: number;
 }
 
-export class Text extends LayoutView<StyleConfig> {
+export class Text extends LayoutView<StyleConfig, string> {
   private font: Font;
   private lines: Array<string> = [];
   private unitsPerEm: number;
   private scale: number;
 
-  constructor(
-    public content: string,
-    config: Partial<LayoutConfig & StyleConfig>
-  ) {
+  constructor(config: Partial<LayoutConfig<string> & StyleConfig>) {
     super(config);
     this.font = Fonts.get(this.styleConfig.font)!;
     this.unitsPerEm = this.font.unitsPerEm;
@@ -57,14 +54,21 @@ export class Text extends LayoutView<StyleConfig> {
 
   public override handle(e: Event): void {
     if (e instanceof MouseUpEvent) {
-      console.log(this.content.split("").map((c) => this.font.glyphs[c]));
+      console.log(
+        (this.layoutConfig.children as Array<string>)
+          .join("")
+          .split("")
+          .map((c) => this.font.glyphs[c])
+      );
       e.handled = true;
     }
   }
 
   public override layout(): void {
     this.lines = [];
-    const words = this.content.split(/\s+/);
+    const words = (this.layoutConfig.children as Array<string>)
+      .join("")
+      .split(/\s+/);
     if (!words.length) return;
 
     const spaceWidth = this.styleConfig.size / 4;

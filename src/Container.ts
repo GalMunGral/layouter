@@ -18,16 +18,18 @@ export interface StyleConfig {
 }
 
 export abstract class Container extends LayoutView<StyleConfig> {
-  constructor(
-    config: Partial<LayoutConfig & StyleConfig>,
-    public children: LayoutView<any>[] = []
-  ) {
+  public children: Array<LayoutView<any>> = [];
+  constructor(config: Partial<LayoutConfig & StyleConfig>) {
     super(config);
-    for (let child of children) {
-      child.parent = this;
-    }
+    if (config.children)
+      for (let child of config.children) {
+        child.parent = this;
+      }
     // TODO: other methods
     const parent = this;
+
+    this.children = this.layoutConfig.children;
+
     this.children.push = function (view: LayoutView<any>): number {
       view.parent = parent;
       Array.prototype.push.call(this, view);
@@ -39,9 +41,7 @@ export abstract class Container extends LayoutView<StyleConfig> {
     };
   }
 
-  protected initStyle(
-    config: Partial<StyleConfig & LayoutConfig>
-  ): StyleConfig {
+  public initStyle(config: Partial<StyleConfig & LayoutConfig>): StyleConfig {
     return {
       backgroundColor: config.backgroundColor ?? "rgba(0,0,0,0)",
       borderColor: config.borderColor ?? "rgba(0,0,0,0)",
@@ -93,6 +93,7 @@ export abstract class Container extends LayoutView<StyleConfig> {
     ctx.fillRect(x, y, width, height);
 
     ctx.restore();
+
     for (let child of this.children) {
       const d = dirty.intersect(child.visible);
       if (d) child.draw(d);

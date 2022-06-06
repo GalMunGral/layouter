@@ -10,10 +10,13 @@ export class Display {
         document.body.style.margin = "0px";
         document.body.append(this.canvas);
         this.render();
+        console.log(this.root);
     }
     render() {
-        this.canvas.width = window.innerWidth;
-        this.canvas.height = window.innerHeight;
+        this.canvas.width = window.innerWidth * window.devicePixelRatio;
+        this.canvas.height = window.innerHeight * window.devicePixelRatio;
+        this.canvas.style.width = window.innerWidth + "px";
+        this.canvas.style.height = window.innerHeight + "px";
         this.root.frame = new Rect(0, 0, this.canvas.width, this.canvas.height);
         this.root.visible = this.root.frame;
         this.root.layout();
@@ -24,13 +27,13 @@ export class Display {
             this.render();
         }, 100);
         window.onmousedown = (e) => {
-            const pos = new Point(e.clientX, e.clientY);
+            const pos = new Point(e.clientX * window.devicePixelRatio, e.clientY * window.devicePixelRatio);
             const evt = new MouseDownEvent(pos);
             this.root.handle(evt);
             Event.previous = evt;
         };
         window.onmouseup = (e) => {
-            const pos = new Point(e.clientX, e.clientY);
+            const pos = new Point(e.clientX * window.devicePixelRatio, e.clientY * window.devicePixelRatio);
             const evt = new MouseUpEvent(pos);
             this.root.handle(evt);
             if (Event.previous instanceof MouseDownEvent) {
@@ -39,7 +42,7 @@ export class Display {
             Event.previous = evt;
         };
         window.onmousemove = throttle((e) => {
-            const pos = new Point(e.clientX, e.clientY);
+            const pos = new Point(e.clientX * window.devicePixelRatio, e.clientY * window.devicePixelRatio);
             const evt = new MouseMoveEvent(pos);
             this.root.handle(evt);
             Event.previous = evt;

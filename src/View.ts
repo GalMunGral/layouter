@@ -36,8 +36,8 @@ export abstract class View<
     });
   }
 
-  protected abstract initLayout(config: Partial<Style & Layout>): Layout;
-  protected abstract initStyle(config: Partial<Style & Layout>): Style;
+  public abstract initLayout(config: Partial<Style & Layout>): Layout;
+  public abstract initStyle(config: Partial<Style & Layout>): Style;
 
   public abstract layout(): void;
   public abstract draw(dirty: Rect): void;
@@ -50,23 +50,27 @@ export abstract class View<
   }
 }
 
-export interface LayoutConfig {
+export interface LayoutConfig<ChildType = LayoutView<any, any>> {
   dimension: [number, number];
   margin: [number, number, number, number];
   weight: number;
+  children: Array<ChildType>;
 }
 
-export abstract class LayoutView<Style extends object> extends View<
-  LayoutConfig,
-  Style
-> {
-  override initLayout(config: Partial<LayoutConfig & Style>): LayoutConfig {
+export abstract class LayoutView<
+  Style extends object,
+  ChildType = LayoutView<any, any>
+> extends View<LayoutConfig<ChildType>, Style> {
+  override initLayout(
+    config: Partial<LayoutConfig<ChildType> & Style>
+  ): LayoutConfig<ChildType> {
     const view = this;
     return new Proxy(
       {
         dimension: config.dimension ?? [0, 0],
         margin: config.margin ?? [-1, -1, -1, -1],
         weight: config.weight ?? 1,
+        children: config.children ?? [],
       },
       {
         set(target, prop, value, receiver) {

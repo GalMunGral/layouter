@@ -3,9 +3,8 @@ import { MouseUpEvent } from "./Event.js";
 import { Fonts } from "./Font.js";
 import { LayoutView } from "./View.js";
 export class Text extends LayoutView {
-    constructor(content, config) {
+    constructor(config) {
         super(config);
-        this.content = content;
         this.lines = [];
         this.font = Fonts.get(this.styleConfig.font);
         this.unitsPerEm = this.font.unitsPerEm;
@@ -34,13 +33,18 @@ export class Text extends LayoutView {
     }
     handle(e) {
         if (e instanceof MouseUpEvent) {
-            console.log(this.content.split("").map((c) => this.font.glyphs[c]));
+            console.log(this.layoutConfig.children
+                .join("")
+                .split("")
+                .map((c) => this.font.glyphs[c]));
             e.handled = true;
         }
     }
     layout() {
         this.lines = [];
-        const words = this.content.split(/\s+/);
+        const words = this.layoutConfig.children
+            .join("")
+            .split(/\s+/);
         if (!words.length)
             return;
         const spaceWidth = this.styleConfig.size / 4;

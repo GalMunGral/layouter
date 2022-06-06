@@ -2,14 +2,16 @@ import { Display } from "./Display.js";
 import { Event, MouseClickEvent, MouseEnterEvent, MouseExitEvent, } from "./Event.js";
 import { LayoutView } from "./View.js";
 export class Container extends LayoutView {
-    constructor(config, children = []) {
+    constructor(config) {
         super(config);
-        this.children = children;
-        for (let child of children) {
-            child.parent = this;
-        }
+        this.children = [];
+        if (config.children)
+            for (let child of config.children) {
+                child.parent = this;
+            }
         // TODO: other methods
         const parent = this;
+        this.children = this.layoutConfig.children;
         this.children.push = function (view) {
             view.parent = parent;
             Array.prototype.push.call(this, view);
