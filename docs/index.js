@@ -1,6 +1,5 @@
 import { Display } from "./Display.js";
 import { HScroll } from "./HScroll.js";
-import { HStack } from "./HStack.js";
 import { Text } from "./Text.js";
 import { VScroll } from "./VScroll.js";
 import { VStack } from "./VStack.js";
@@ -37,7 +36,7 @@ initFonts([
             this.children = [
                 Test(HScroll, { margin: [0, 0, 0, 0], backgroundColor: [128, 128, 128, 1], data: Array(size)
                         .fill(0)
-                        .map((_, i) => ({ id: String(i) })), renderItem: (i) => (Test(VStack, { dimension: [200, Infinity], margin: [10, 0, 10, 10], backgroundColor: [0, 0, 0, 1] },
+                        .map((_, i) => ({ id: String(i) })), renderItem: (i) => (Test(VStack, { shadowWidth: [2, 2, 2, 2], shadowColor: [0, 0, 0, 0.5], dimension: [200, Infinity], margin: [10, 0, 10, 10], backgroundColor: [0, 0, 0, 1] },
                         Test(Text, { font: "Computer Modern", dimension: [Infinity, 40], margin: [0, 0, 0, 0], backgroundColor: [255, 255, 255, 1], weight: 0 }, "Computer Modern " + i.id),
                         Test(VList, { size: size }))) }),
             ];
@@ -101,13 +100,43 @@ initFonts([
             ];
         }
     }
-    new Display((Test(HStack, { dimension: [10, 10], backgroundColor: [0, 0, 0, 1] },
-        Test(VStack, { weight: 50, margin: [0, 0, 0, 0] },
-            Test(FancyText, { font: "PartyLET", size: 30, margin: [10, 10, 0, 10] }, ipsum),
-            Test(Text, { font: "Trattatello", size: 30, margin: [10, 10, 0, 10], backgroundColor: [255, 255, 255, 1] }, ipsum),
-            Test(Text, { font: "Noto Sans", size: 30, margin: [10, 10, 0, 10], backgroundColor: [255, 255, 255, 1] }, ipsum)),
-        Test(FibVStack, { dimension: [200, Infinity], weight: 5, margin: [0, 0, 0, 0], backgroundColor: [255, 170, 170, 1] }),
-        Test(VStack, { weight: 200, margin: [0, 0, 0, 0] },
-            Test(HList, { size: 20 }),
-            Test(VList2, { size: 10 })))));
+    new Display((Test(VStack, null,
+        Test(VStack, { backgroundColor: [255, 0, 0, 1], margin: [-1, -1, -1, -1], dimension: [300, 300], shadowColor: [0, 0, 0, 1], shadowWidth: [20, 20, 20, 20] }))));
+    //   new Display(
+    //     (
+    //       <HStack dimension={[10, 10]} backgroundColor={[0, 0, 0, 1]}>
+    //         <VStack weight={50} margin={[0, 0, 0, 0]}>
+    //           <FancyText font="PartyLET" size={30} margin={[10, 10, 0, 10]}>
+    //             {ipsum}
+    //           </FancyText>
+    //           <Text
+    //             font="Trattatello"
+    //             size={30}
+    //             margin={[10, 10, 0, 10]}
+    //             backgroundColor={[255, 255, 255, 1]}
+    //           >
+    //             {ipsum}
+    //           </Text>
+    //           <Text
+    //             font="Noto Sans"
+    //             size={30}
+    //             margin={[10, 10, 0, 10]}
+    //             backgroundColor={[255, 255, 255, 1]}
+    //           >
+    //             {ipsum}
+    //           </Text>
+    //         </VStack>
+    //         <FibVStack
+    //           dimension={[200, Infinity]}
+    //           weight={5}
+    //           margin={[0, 0, 0, 0]}
+    //           backgroundColor={[255, 170, 170, 1]}
+    //         />
+    //         <VStack weight={200} margin={[0, 0, 0, 0]}>
+    //           <HList size={20} />
+    //           <VList2 size={10} />
+    //         </VStack>
+    //       </HStack>
+    //     )
+    //   );
 });

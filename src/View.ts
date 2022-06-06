@@ -15,7 +15,7 @@ export type ViewProps<C> = {
   borderColor: vec4;
   borderRadius: vec4;
   borderWidth: vec4;
-  shadowcolor: vec4;
+  shadowColor: vec4;
   shadowWidth: vec4;
   padding: vec4;
   font: string;
@@ -39,7 +39,7 @@ export abstract class View<C = any> {
     weight: 1,
     backgroundColor: [0, 0, 0, 0],
     borderColor: [0, 0, 0, 0],
-    shadowcolor: [0, 0, 0, 0],
+    shadowColor: [0, 0, 0, 0],
     borderWidth: [0, 0, 0, 0],
     borderRadius: [0, 0, 0, 0],
     shadowWidth: [0, 0, 0, 0],
@@ -94,8 +94,110 @@ export abstract class View<C = any> {
     });
   }
 
+  protected get contentWidth(): number {
+    return this.frame.width - this.props.padding[1] - this.props.padding[3];
+  }
+
+  protected get contentHeight(): number {
+    return this.frame.height - this.props.padding[0] - this.props.padding[2];
+  }
+
   public abstract layout(): void;
-  public abstract draw(dirty: Rect): void;
+
+  public draw(dirty: Rect): void {
+    const ctx = Display.instance.ctx;
+    ctx.save();
+
+    ctx.beginPath();
+    ctx.rect(dirty.x, dirty.y, dirty.width, dirty.height);
+    ctx.clip();
+
+    ctx.fillStyle = "rgba(" + this.props.backgroundColor.join(",") + ")";
+    const { x, y, width, height } = this.frame;
+    ctx.fillRect(x, y, width, height);
+    ctx.restore();
+
+    // TODO: SHADOWS
+    const { shadowColor, shadowWidth } = this.props;
+    const colorStart = "rgba(" + shadowColor.join(",") + ")";
+    const colorEnd = "rgba(" + shadowColor.slice(0, 3).join(",") + ",0)";
+    const x0 = x - shadowWidth[3];
+    const x1 = x;
+    const x2 = x + width;
+    const x3 = x + width + shadowWidth[1];
+    const y0 = y - shadowWidth[0];
+    const y1 = y;
+    const y2 = y + height;
+    const y3 = y + height + shadowWidth[2];
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(x0, y0);
+    ctx.lineTo(x3, y0);
+    ctx.lineTo(x2, y1);
+    ctx.lineTo(x1, y1);
+    ctx.closePath();
+    ctx.clip();
+    {
+      const gradient = ctx.createLinearGradient(x0, y1, x0, y0);
+      gradient.addColorStop(0, colorStart);
+      gradient.addColorStop(1, colorEnd);
+      ctx.fillStyle = gradient;
+      ctx.fillRect(x0, y0, x3 - x0, y1 - y0);
+    }
+    ctx.restore();
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(x2, y1);
+    ctx.lineTo(x3, y0);
+    ctx.lineTo(x3, y3);
+    ctx.lineTo(x2, y2);
+    ctx.closePath();
+    ctx.clip();
+    {
+      const gradient = ctx.createLinearGradient(x2, y0, x3, y0);
+      gradient.addColorStop(0, colorStart);
+      gradient.addColorStop(1, colorEnd);
+      ctx.fillStyle = gradient;
+      ctx.fillRect(x2, y0, x3 - x2, y3 - y0);
+    }
+    ctx.restore();
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(x1, y2);
+    ctx.lineTo(x0, y3);
+    ctx.lineTo(x3, y3);
+    ctx.lineTo(x2, y2);
+    ctx.closePath();
+    ctx.clip();
+    {
+      const gradient = ctx.createLinearGradient(x0, y2, x0, y3);
+      gradient.addColorStop(0, colorStart);
+      gradient.addColorStop(1, colorEnd);
+      ctx.fillStyle = gradient;
+      ctx.fillRect(x0, y2, x3 - x0, y3 - y2);
+    }
+    ctx.restore();
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(x0, y0);
+    ctx.lineTo(x1, y1);
+    ctx.lineTo(x1, y2);
+    ctx.lineTo(x0, y3);
+    ctx.closePath();
+    ctx.clip();
+    {
+      const gradient = ctx.createLinearGradient(x1, y0, x0, y0);
+      gradient.addColorStop(0, colorStart);
+      gradient.addColorStop(1, colorEnd);
+      ctx.fillStyle = gradient;
+      ctx.fillRect(x0, y0, x1 - x0, y3 - y0);
+    }
+    ctx.restore();
+  }
   public abstract handle(e: Event): void;
   public redraw(): void {
     if (this.visible) {

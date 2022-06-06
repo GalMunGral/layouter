@@ -1,4 +1,3 @@
-import { Display } from "./Display.js";
 import { View } from "./View.js";
 import { Event, MouseClickEvent, MouseEnterEvent, MouseExitEvent, } from "./Event.js";
 export class Container extends View {
@@ -37,15 +36,7 @@ export class Container extends View {
         }
     }
     draw(dirty) {
-        const ctx = Display.instance.ctx;
-        ctx.save();
-        ctx.beginPath();
-        ctx.rect(dirty.x, dirty.y, dirty.width, dirty.height);
-        ctx.clip();
-        ctx.fillStyle = "rgba(" + this.props.backgroundColor.join(",") + ")";
-        const { x, y, width, height } = this.frame;
-        ctx.fillRect(x, y, width, height);
-        ctx.restore();
+        super.draw(dirty);
         for (let child of this.children) {
             const d = dirty.intersect(child.visible);
             if (d)

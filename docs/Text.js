@@ -12,12 +12,6 @@ export class Text extends View {
         this.props.size;
         this.scale = this.props.size / this.unitsPerEm;
     }
-    get contentWidth() {
-        return this.frame.width - this.props.padding[1] - this.props.padding[3];
-    }
-    get contentHeight() {
-        return this.frame.height - this.props.padding[0] - this.props.padding[2];
-    }
     handle(e) {
         if (e instanceof MouseUpEvent) {
             console.log(this.content.split("").map((c) => this.font.glyphs[c]));
@@ -71,14 +65,9 @@ export class Text extends View {
         ctx.fill();
     }
     draw(dirty) {
+        super.draw(dirty);
         const ctx = Display.instance.ctx;
         ctx.save();
-        ctx.beginPath();
-        ctx.rect(dirty.x, dirty.y, dirty.width, dirty.height);
-        ctx.clip();
-        ctx.fillStyle = "rgba(" + this.props.backgroundColor.join(",") + ")";
-        const { x, y, width, height } = this.frame;
-        ctx.fillRect(x, y, width, height);
         ctx.fillStyle = "rgba(" + this.props.color.join(",") + ")";
         for (let [i, line] of this.lines.entries()) {
             if (this.props.size * (i + 1) > this.contentHeight)

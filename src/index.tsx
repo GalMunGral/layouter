@@ -60,6 +60,8 @@ initFonts([
             .map((_, i) => ({ id: String(i) }))}
           renderItem={(i) => (
             <VStack
+              shadowWidth={[2, 2, 2, 2]}
+              shadowColor={[0, 0, 0, 0.5]}
               dimension={[200, Infinity]}
               margin={[10, 0, 10, 10]}
               backgroundColor={[0, 0, 0, 1]}
@@ -190,39 +192,53 @@ initFonts([
 
   new Display(
     (
-      <HStack dimension={[10, 10]} backgroundColor={[0, 0, 0, 1]}>
-        <VStack weight={50} margin={[0, 0, 0, 0]}>
-          <FancyText font="PartyLET" size={30} margin={[10, 10, 0, 10]}>
-            {ipsum}
-          </FancyText>
-          <Text
-            font="Trattatello"
-            size={30}
-            margin={[10, 10, 0, 10]}
-            backgroundColor={[255, 255, 255, 1]}
-          >
-            {ipsum}
-          </Text>
-          <Text
-            font="Noto Sans"
-            size={30}
-            margin={[10, 10, 0, 10]}
-            backgroundColor={[255, 255, 255, 1]}
-          >
-            {ipsum}
-          </Text>
-        </VStack>
-        <FibVStack
-          dimension={[200, Infinity]}
-          weight={5}
-          margin={[0, 0, 0, 0]}
-          backgroundColor={[255, 170, 170, 1]}
+      <VStack>
+        <VStack
+          backgroundColor={[255, 0, 0, 1]}
+          margin={[-1, -1, -1, -1]}
+          dimension={[300, 300]}
+          shadowColor={[0, 0, 0, 1]}
+          shadowWidth={[20, 20, 20, 20]}
         />
-        <VStack weight={200} margin={[0, 0, 0, 0]}>
-          <HList size={20} />
-          <VList2 size={10} />
-        </VStack>
-      </HStack>
+      </VStack>
     )
   );
+
+  //   new Display(
+  //     (
+  //       <HStack dimension={[10, 10]} backgroundColor={[0, 0, 0, 1]}>
+  //         <VStack weight={50} margin={[0, 0, 0, 0]}>
+  //           <FancyText font="PartyLET" size={30} margin={[10, 10, 0, 10]}>
+  //             {ipsum}
+  //           </FancyText>
+  //           <Text
+  //             font="Trattatello"
+  //             size={30}
+  //             margin={[10, 10, 0, 10]}
+  //             backgroundColor={[255, 255, 255, 1]}
+  //           >
+  //             {ipsum}
+  //           </Text>
+  //           <Text
+  //             font="Noto Sans"
+  //             size={30}
+  //             margin={[10, 10, 0, 10]}
+  //             backgroundColor={[255, 255, 255, 1]}
+  //           >
+  //             {ipsum}
+  //           </Text>
+  //         </VStack>
+  //         <FibVStack
+  //           dimension={[200, Infinity]}
+  //           weight={5}
+  //           margin={[0, 0, 0, 0]}
+  //           backgroundColor={[255, 170, 170, 1]}
+  //         />
+  //         <VStack weight={200} margin={[0, 0, 0, 0]}>
+  //           <HList size={20} />
+  //           <VList2 size={10} />
+  //         </VStack>
+  //       </HStack>
+  //     )
+  //   );
 });

@@ -47,19 +47,7 @@ export abstract class Container extends View<View> {
   }
 
   override draw(dirty: Rect) {
-    const ctx = Display.instance.ctx;
-    ctx.save();
-
-    ctx.beginPath();
-    ctx.rect(dirty.x, dirty.y, dirty.width, dirty.height);
-    ctx.clip();
-
-    ctx.fillStyle = "rgba(" + this.props.backgroundColor.join(",") + ")";
-    const { x, y, width, height } = this.frame;
-    ctx.fillRect(x, y, width, height);
-
-    ctx.restore();
-
+    super.draw(dirty);
     for (let child of this.children) {
       const d = dirty.intersect(child.visible);
       if (d) child.draw(d);
