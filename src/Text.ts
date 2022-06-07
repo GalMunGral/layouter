@@ -20,7 +20,9 @@ export class Text extends View<string> {
     this.content = this.children.join("");
   }
 
-  public handle(e: Event): void {}
+  public handle(e: Event): void {
+    super.handle(e);
+  }
 
   public override layout(): void {
     this.lines = [];

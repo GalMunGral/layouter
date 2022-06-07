@@ -10,7 +10,9 @@ export class Text extends View {
         const props = this.deviceProps;
         return `${props.size}px ${props.fontFamily}`;
     }
-    handle(e) { }
+    handle(e) {
+        super.handle(e);
+    }
     layout() {
         this.lines = [];
         const props = this.deviceProps;

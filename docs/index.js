@@ -8,19 +8,30 @@ import { VStack } from "./VStack.js";
 function Test(type, props, ...children) {
     return new type(Object.assign(Object.assign({}, props), { children }));
 }
+const store = {
+    _test: false,
+    _sub: [],
+    get test() {
+        return this._test;
+    },
+    set test(v) {
+        this._test = v;
+        this._sub.forEach((f) => f(v));
+    },
+};
+const ob = new Observable((h) => {
+    store._sub.push((v) => {
+        h(v);
+    });
+});
 new Display((Test(VStack, { backgroundColor: [0, 0, 0, 1] },
     Test(HStack, { dimension: [Infinity, 100], backgroundColor: [255, 0, 0, 1], margin: [10, 10, 10, 10], shadowColor: [255, 255, 0, 1], shadowOffset: [0, 0], shadowBlur: 20, borderWidth: 4, borderColor: [255, 255, 255, 1], borderRadius: [10, 20, 30, 40] },
-        Test(Text, { size: 20, padding: [10, 10, 10, 10] }, "\u5566\u5566\u5566 TEST sdfsdf asdf asldkfj asd lasdjflaksd jflaksdjf; alk sdf; alsdkfja; lsdkfj alksdjf lskdjfkdjf sdf sdkfj skdjfwlek jwl sodifu wlekj lskdf uwoekrjfl kjsdlf iu"),
-        Test(Video, { visible: new Observable((h) => {
-                let v = false;
-                setInterval(() => {
-                    h((v = !v));
-                }, 800);
-            }), backgroundColor: [255, 255, 255, 0.5], dimension: [500, 300], objectFit: "contain", url: "test.mp4" })),
+        Test(Text, { size: 20, padding: [10, 10, 10, 10], onClick: () => (store.test = !store.test) }, "\u5566\u5566\u5566 TEST sdfsdf asdf asldkfj asd lasdjflaksd jflaksdjf; alk sdf; alsdkfja; lsdkfj alksdjf lskdjfkdjf sdf sdkfj skdjfwlek jwl sodifu wlekj lskdf uwoekrjfl kjsdlf iu"),
+        Test(Video, { visible: ob, backgroundColor: [255, 255, 255, 0.5], dimension: [500, 300], objectFit: "contain", url: "test.mp4" })),
     Test(VStack, { dimension: [Infinity, 100], backgroundColor: [0, 0, 0, 1], margin: [10, 10, 10, 10], shadowColor: [255, 255, 9, 1], shadowOffset: [0, 0], shadowBlur: 20, borderWidth: 4, borderColor: [255, 255, 255, 1], borderRadius: [10, 20, 30, 40] },
         Test(HStack, null,
             Test(VStack, { dimension: [100, Infinity], margin: [10, 10, 10, 10], backgroundColor: [255, 255, 255, 1], borderRadius: [10, 10, 10, 10], weight: 2 },
-                Test(Text, { fontFamily: "Times New Roman", size: 20, padding: [10, 10, 10, 10], textAlign: "start" }, "\u5566\u5566\u5566 TEST sdfsdf asdf asldkfj asd lasdjflaksd jflaksdjf; sdf; alsdkfja; lsdkfj alksdjf lskdjfkdjf sdf sdkfj skdjfwlek jwl sodifu wlekj lskdf uwoekrjfl kjsdlf iu")),
+                Test(Text, { fontFamily: ob.$((v) => (v ? "Times New Roman" : "monospace")), size: 20, padding: [10, 10, 10, 10], textAlign: "start" }, "\u5566\u5566\u5566 TEST sdfsdf asdf asldkfj asd lasdjflaksd jflaksdjf; sdf; alsdkfja; lsdkfj alksdjf lskdjfkdjf sdf sdkfj skdjfwlek jwl sodifu wlekj lskdf uwoekrjfl kjsdlf iu")),
             Test(VScroll, { dimension: [100, Infinity], weight: 1, backgroundColor: [255, 244, 100, 1], data: new Observable((f) => {
                     let arr = Array(30)
                         .fill(0)

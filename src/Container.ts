@@ -10,7 +10,7 @@ import { Display } from "./Display.js";
 
 export interface StyleConfig {}
 
-export abstract class Container extends View<View> {
+export class Container extends View<View> {
   constructor(config: ViewConfig<View>) {
     super(config);
     for (let child of this.children) {
@@ -31,12 +31,7 @@ export abstract class Container extends View<View> {
         }
       }
     }
-    // if (e instanceof MouseClickEvent && !e.handled) {
-    //   this.props.weight++;
-    //   this.props.dimension[0]++;
-    //   this.props.dimension[1]++;
-    //   e.handled = true;
-    // }
+    super.handle(e);
   }
 
   protected get visibleChildren() {

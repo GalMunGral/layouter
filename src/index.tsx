@@ -10,6 +10,23 @@ import { VStack } from "./VStack.js";
 function Test<T>(type: new (p: T) => any, props: T, ...children: any[]) {
   return new type({ ...props, children });
 }
+const store = {
+  _test: false,
+  _sub: [] as ((v: boolean) => void)[],
+  get test() {
+    return this._test;
+  },
+  set test(v) {
+    this._test = v;
+    this._sub.forEach((f) => f(v));
+  },
+};
+
+const ob = new Observable<boolean>((h) => {
+  store._sub.push((v) => {
+    h(v);
+  });
+});
 
 new Display(
   (
@@ -25,20 +42,17 @@ new Display(
         borderColor={[255, 255, 255, 1]}
         borderRadius={[10, 20, 30, 40]}
       >
-        <Text size={20} padding={[10, 10, 10, 10]}>
+        <Text
+          size={20}
+          padding={[10, 10, 10, 10]}
+          onClick={() => (store.test = !store.test)}
+        >
           啦啦啦 TEST sdfsdf asdf asldkfj asd lasdjflaksd jflaksdjf; alk sdf;
           alsdkfja; lsdkfj alksdjf lskdjfkdjf sdf sdkfj skdjfwlek jwl sodifu
           wlekj lskdf uwoekrjfl kjsdlf iu
         </Text>
         <Video
-          visible={
-            new Observable((h) => {
-              let v = false;
-              setInterval(() => {
-                h((v = !v));
-              }, 800);
-            })
-          }
+          visible={ob}
           backgroundColor={[255, 255, 255, 0.5]}
           dimension={[500, 300]}
           objectFit="contain"
@@ -65,7 +79,7 @@ new Display(
             weight={2}
           >
             <Text
-              fontFamily="Times New Roman"
+              fontFamily={ob.$((v) => (v ? "Times New Roman" : "monospace"))}
               size={20}
               padding={[10, 10, 10, 10]}
               textAlign="start"

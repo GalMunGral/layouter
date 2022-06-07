@@ -1,4 +1,5 @@
 import { Display } from "./Display.js";
+import { MouseClickEvent } from "./Event.js";
 import { Rect } from "./Geometry.js";
 import { Observable } from "./Observable.js";
 export class View {
@@ -72,7 +73,8 @@ export class View {
                         if (prop == "visible" ||
                             prop == "dimension" ||
                             prop == "margin" ||
-                            prop == "weight") {
+                            prop == "weight" ||
+                            prop == "fontFamily") {
                             let cur = view;
                             const root = Display.instance.root;
                             while (cur != root && !cur.isLayoutRoot)
@@ -141,7 +143,12 @@ export class View {
         ctx.fill(p);
         ctx.clip(p);
     }
-    handle(e) { }
+    handle(e) {
+        var _a, _b;
+        if (e instanceof MouseClickEvent) {
+            (_b = (_a = this.props).onClick) === null || _b === void 0 ? void 0 : _b.call(_a, e);
+        }
+    }
     redraw() {
         if (this.visible) {
             Display.instance.root.draw(this.visible);

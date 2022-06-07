@@ -65,13 +65,6 @@ export abstract class Scroll<T extends { id: string }> extends Container {
 
   handle(e: Event): void {
     super.handle(e);
-    // const simulateInertia = () => {
-    //   if (!this.delta) return;
-    //   this.scroll(this.delta);
-    //   this.delta += this.delta > 0 ? -1 : 1;
-    //   setTimeout(simulateInertia, 16);
-    // };
-    // simulateInertia();
     e.handled = true;
   }
 }

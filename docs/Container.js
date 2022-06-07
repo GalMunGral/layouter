@@ -23,12 +23,7 @@ export class Container extends View {
                 }
             }
         }
-        // if (e instanceof MouseClickEvent && !e.handled) {
-        //   this.props.weight++;
-        //   this.props.dimension[0]++;
-        //   this.props.dimension[1]++;
-        //   e.handled = true;
-        // }
+        super.handle(e);
     }
     get visibleChildren() {
         return this.children.filter((c) => c.props.visible);

@@ -1,5 +1,5 @@
 import { Display } from "./Display.js";
-import { Event } from "./Event.js";
+import { Event, MouseClickEvent } from "./Event.js";
 import { Rect } from "./Geometry.js";
 import { Observable } from "./Observable.js";
 import { Scroll } from "./Scroll.js";
@@ -24,6 +24,7 @@ export type ViewProps = {
   textAlign: "start" | "center";
   size: number;
   color: vec4;
+  onClick?: (e: MouseClickEvent) => void;
 };
 
 export type ViewConfig<C = any> = Partial<{
@@ -104,7 +105,8 @@ export class View<C = any> {
               prop == "visible" ||
               prop == "dimension" ||
               prop == "margin" ||
-              prop == "weight"
+              prop == "weight" ||
+              prop == "fontFamily"
             ) {
               let cur: View = view;
               const root = Display.instance.root;
@@ -207,7 +209,11 @@ export class View<C = any> {
     ctx.clip(p);
   }
 
-  public handle(e: Event): void {}
+  public handle(e: Event): void {
+    if (e instanceof MouseClickEvent) {
+      this.props.onClick?.(e);
+    }
+  }
 
   public redraw(): void {
     if (this.visible) {
