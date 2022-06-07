@@ -1,4 +1,3 @@
-import { Display } from "./Display.js";
 import { Rect } from "./Geometry.js";
 import { View, ViewConfig } from "./View.js";
 import {
@@ -31,12 +30,12 @@ export abstract class Container extends View<View> {
         }
       }
     }
-    if (e instanceof MouseClickEvent && !e.handled) {
-      this.props.weight++;
-      this.props.dimension[0]++;
-      this.props.dimension[1]++;
-      e.handled = true;
-    }
+    // if (e instanceof MouseClickEvent && !e.handled) {
+    //   this.props.weight++;
+    //   this.props.dimension[0]++;
+    //   this.props.dimension[1]++;
+    //   e.handled = true;
+    // }
   }
 
   protected layoutChildren() {

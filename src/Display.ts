@@ -4,6 +4,7 @@ import {
   MouseDownEvent,
   MouseMoveEvent,
   MouseUpEvent,
+  WheelEvent,
 } from "./Event.js";
 import { Point, Rect } from "./Geometry.js";
 import { View } from "./View.js";
@@ -19,6 +20,7 @@ export class Display {
     document.body.style.margin = "0px";
     document.body.append(this.canvas);
     this.render();
+    console.log(this.root);
   }
 
   render() {
@@ -66,6 +68,19 @@ export class Display {
       this.root.handle(evt);
       Event.previous = evt;
     });
+    window.onwheel = throttle((e) => {
+      const pos = new Point(
+        e.clientX * window.devicePixelRatio,
+        e.clientY * window.devicePixelRatio
+      );
+      const evt = new WheelEvent(
+        pos,
+        e.deltaX * window.devicePixelRatio,
+        e.deltaY * window.devicePixelRatio
+      );
+      this.root.handle(evt);
+      Event.previous = evt;
+    }, 16);
   }
 }
 

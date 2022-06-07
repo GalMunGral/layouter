@@ -1,9 +1,9 @@
 import { Container } from "./Container.js";
 export class Stack extends Container {
     finalize(child) {
-        const { frame, outerFrame, props } = child;
-        let [width, height] = props.dimension;
-        const [top, right, bottom, left] = props.margin;
+        const { frame, outerFrame, deviceProps } = child;
+        let [width, height] = deviceProps.dimension;
+        const [top, right, bottom, left] = deviceProps.margin;
         if (top > -1 && bottom > -1) {
             frame.y = outerFrame.y + top;
             frame.height = outerFrame.height - top - bottom;

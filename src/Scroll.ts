@@ -16,6 +16,7 @@ export abstract class Scroll<T extends { id: string }> extends Container {
   protected mousePosition: Point = new Point(0, 0);
   protected delta = 0;
   private childMap: Record<string, View> = {};
+  public override isLayoutRoot = true;
 
   constructor(config: ViewConfig & ScrollConfig<T>) {
     super(config);
@@ -64,20 +65,13 @@ export abstract class Scroll<T extends { id: string }> extends Container {
 
   handle(e: Event): void {
     super.handle(e);
-    if (e instanceof MouseDownEvent) {
-      this.scrolling = true;
-      this.mousePosition = e.point;
-      e.handled = true;
-    } else if (e instanceof MouseUpEvent) {
-      this.scrolling = false;
-      const simulateInertia = () => {
-        if (!this.delta) return;
-        this.scroll(this.delta);
-        this.delta += this.delta > 0 ? -1 : 1;
-        setTimeout(simulateInertia, 16);
-      };
-      simulateInertia();
-      e.handled = true;
-    }
+    // const simulateInertia = () => {
+    //   if (!this.delta) return;
+    //   this.scroll(this.delta);
+    //   this.delta += this.delta > 0 ? -1 : 1;
+    //   setTimeout(simulateInertia, 16);
+    // };
+    // simulateInertia();
+    e.handled = true;
   }
 }

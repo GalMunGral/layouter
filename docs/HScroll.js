@@ -1,13 +1,10 @@
-import { MouseMoveEvent } from "./Event.js";
+import { WheelEvent } from "./Event.js";
 import { Scroll } from "./Scroll.js";
 export class HScroll extends Scroll {
     handle(e) {
         super.handle(e);
-        if (e instanceof MouseMoveEvent) {
-            if (!this.scrolling)
-                return;
-            this.scroll(e.point.x - this.mousePosition.x);
-            this.mousePosition = e.point;
+        if (e instanceof WheelEvent) {
+            this.scroll(e.deltaX * 0.1);
             e.handled = true;
         }
     }
@@ -16,8 +13,8 @@ export class HScroll extends Scroll {
         let y = this.frame.y;
         let contentWidth = 0;
         for (let child of this.children) {
-            let [width, height] = child.props.dimension;
-            let [top, right, bottom, left] = child.props.margin.map((x) => Math.max(0, x));
+            let [width, height] = child.deviceProps.dimension;
+            let [top, right, bottom, left] = child.deviceProps.margin.map((x) => Math.max(0, x));
             child.frame.x = x + left;
             child.frame.y = y + top;
             child.frame.width = width;

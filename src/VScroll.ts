@@ -1,13 +1,11 @@
-import { Event, MouseMoveEvent } from "./Event.js";
+import { Event, WheelEvent } from "./Event.js";
 import { Scroll } from "./Scroll.js";
 
 export class VScroll<T extends { id: string }> extends Scroll<T> {
   handle(e: Event): void {
     super.handle(e);
-    if (e instanceof MouseMoveEvent) {
-      if (!this.scrolling) return;
-      this.scroll(e.point.y - this.mousePosition.y);
-      this.mousePosition = e.point;
+    if (e instanceof WheelEvent) {
+      this.scroll(-e.deltaY);
       e.handled = true;
     }
   }
@@ -17,8 +15,8 @@ export class VScroll<T extends { id: string }> extends Scroll<T> {
     let y = this.frame.y + this.offset;
     let contentHeight = 0;
     for (let child of this.children) {
-      let [width, height] = child.props.dimension;
-      let [top, right, bottom, left] = child.props.margin.map((x) =>
+      let [width, height] = child.deviceProps.dimension;
+      let [top, right, bottom, left] = child.deviceProps.margin.map((x) =>
         Math.max(0, x)
       );
       child.frame.x = x + left;

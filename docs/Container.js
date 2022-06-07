@@ -1,5 +1,5 @@
 import { View } from "./View.js";
-import { Event, MouseClickEvent, MouseEnterEvent, MouseExitEvent, } from "./Event.js";
+import { Event, MouseEnterEvent, MouseExitEvent, } from "./Event.js";
 export class Container extends View {
     constructor(config) {
         super(config);
@@ -22,12 +22,12 @@ export class Container extends View {
                 }
             }
         }
-        if (e instanceof MouseClickEvent && !e.handled) {
-            this.props.weight++;
-            this.props.dimension[0]++;
-            this.props.dimension[1]++;
-            e.handled = true;
-        }
+        // if (e instanceof MouseClickEvent && !e.handled) {
+        //   this.props.weight++;
+        //   this.props.dimension[0]++;
+        //   this.props.dimension[1]++;
+        //   e.handled = true;
+        // }
     }
     layoutChildren() {
         for (let child of this.children) {

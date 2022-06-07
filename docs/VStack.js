@@ -20,13 +20,13 @@ export class VStack extends Stack {
         let total = this.frame.height;
         let totalWeight = 0;
         for (let child of this.children) {
-            const props = child.props;
+            const props = child.deviceProps;
             total -= Math.min(props.dimension[1], this.frame.height);
             totalWeight += props.weight;
         }
         let rem = total;
         for (let child of this.children) {
-            const props = child.props;
+            const props = child.deviceProps;
             let extra = Math.round((total * props.weight) / totalWeight);
             rem -= extra;
             child.outerFrame.height = props.dimension[1] + extra;

@@ -16,3 +16,10 @@ export class MouseClickEvent extends Event {
 }
 export class MouseExitEvent extends Event {
 }
+export class WheelEvent extends Event {
+    constructor(point, deltaX, deltaY) {
+        super(point);
+        this.deltaX = deltaX;
+        this.deltaY = deltaY;
+    }
+}

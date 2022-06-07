@@ -1,12 +1,12 @@
 import { Display } from "./Display.js";
 import { Rect } from "./Geometry.js";
 import { Observable } from "./Observable.js";
-import { Scroll } from "./Scroll.js";
 export class View {
     constructor(config) {
         this.frame = new Rect(0, 0, 0, 0);
         this.outerFrame = new Rect(0, 0, 0, 0);
         this.visible = null;
+        this.isLayoutRoot = false;
         this.children = [];
         this._props = {
             dimension: [0, 0],
@@ -15,13 +15,15 @@ export class View {
             backgroundColor: [0, 0, 0, 0],
             borderColor: [0, 0, 0, 0],
             shadowColor: [0, 0, 0, 0],
-            borderWidth: [0, 0, 0, 0],
+            borderWidth: 1,
             borderRadius: [0, 0, 0, 0],
-            shadowWidth: [0, 0, 0, 0],
+            shadowOffset: [0, 0],
+            shadowBlur: 0,
             padding: [4, 4, 4, 4],
-            font: "Computer Modern",
-            size: 16,
+            fontFamily: "monospace",
+            textAlign: "center",
             color: [0, 0, 0, 1],
+            size: 16,
         };
         if (config.children) {
             this.children = config.children;
@@ -39,6 +41,22 @@ export class View {
             }
         }
     }
+    get deviceProps() {
+        const props = JSON.parse(JSON.stringify(this.props));
+        for (let key of ["borderWidth", "shadowBlur", "size"]) {
+            props[key] *= window.devicePixelRatio;
+        }
+        for (let key of [
+            "dimension",
+            "margin",
+            "borderRadius",
+            "shadowOffset",
+            "padding",
+        ]) {
+            props[key] = props[key].map((x) => x * window.devicePixelRatio);
+        }
+        return props;
+    }
     get props() {
         const view = this;
         return new Proxy(this._props, {
@@ -53,7 +71,7 @@ export class View {
                         if (prop == "dimension" || prop == "margin" || prop == "weight") {
                             let cur = view;
                             const root = Display.instance.root;
-                            while (cur != root && !(cur instanceof Scroll))
+                            while (cur != root && !cur.isLayoutRoot)
                                 cur = cur.parent;
                             queueMicrotask(() => {
                                 cur.layout();
@@ -71,107 +89,52 @@ export class View {
         });
     }
     get contentWidth() {
-        return this.frame.width - this.props.padding[1] - this.props.padding[3];
+        const props = this.deviceProps;
+        return this.frame.width - props.padding[1] - props.padding[3];
     }
     get contentHeight() {
-        return this.frame.height - this.props.padding[0] - this.props.padding[2];
+        const props = this.deviceProps;
+        return this.frame.height - props.padding[0] - props.padding[2];
     }
     draw(dirty) {
         const ctx = Display.instance.ctx;
-        const { shadowColor, shadowWidth } = this.props;
+        const { backgroundColor, borderColor, shadowColor, shadowOffset, shadowBlur, borderWidth: bw, borderRadius, } = this.deviceProps;
         const { x, y, width, height } = this.frame;
-        const colorStart = "rgba(" + shadowColor.join(",") + ")";
-        const colorEnd = "rgba(" + shadowColor.slice(0, 3).join(",") + ",0)";
-        const x0 = x - shadowWidth[3];
-        const x1 = x;
-        const x2 = x + width;
-        const x3 = x + width + shadowWidth[1];
-        const y0 = y - shadowWidth[0];
-        const y1 = y;
-        const y2 = y + height;
-        const y3 = y + height + shadowWidth[2];
+        const [r0, r1, r2, r3] = borderRadius;
+        const p = new Path2D();
+        p.moveTo(x + r0, y);
+        p.lineTo(x + width - r1, y);
+        p.arcTo(x + width, y, x + width, y + r1, r1);
+        p.lineTo(x + width, y + height - r2);
+        p.arcTo(x + width, y + height, x + width - r2, y + height, r2);
+        p.lineTo(x + r3, y + height);
+        p.arcTo(x, y + height, x, y + height - r3, r3);
+        p.lineTo(x, y + r0);
+        p.arcTo(x, y, x + r0, y, r0);
         ctx.save();
         ctx.beginPath();
         ctx.rect(dirty.x, dirty.y, dirty.width, dirty.height);
         ctx.clip();
-        ctx.fillStyle = "rgba(" + this.props.backgroundColor.join(",") + ")";
-        ctx.fillRect(x, y, width, height);
-        ctx.restore();
-        ctx.save();
+        ctx.fillStyle = "rgba(" + backgroundColor.join(",") + ")";
+        ctx.shadowColor = "rgba(" + shadowColor.join(",") + ")";
+        ctx.shadowBlur = shadowBlur;
+        ctx.shadowOffsetX = shadowOffset[0];
+        ctx.shadowOffsetY = shadowOffset[1];
         ctx.beginPath();
-        ctx.moveTo(x0, y0);
-        ctx.lineTo(x3, y0);
-        ctx.lineTo(x2, y1);
-        ctx.lineTo(x1, y1);
-        ctx.closePath();
-        ctx.clip();
-        ctx.beginPath();
-        ctx.rect(dirty.x, dirty.y, dirty.width, dirty.height);
-        ctx.clip();
-        {
-            const gradient = ctx.createLinearGradient(x0, y1, x0, y0);
-            gradient.addColorStop(0, colorStart);
-            gradient.addColorStop(1, colorEnd);
-            ctx.fillStyle = gradient;
-            ctx.fillRect(x0, y0, x3 - x0, y1 - y0);
-        }
-        ctx.restore();
-        ctx.save();
-        ctx.beginPath();
-        ctx.moveTo(x2, y1);
-        ctx.lineTo(x3, y0);
-        ctx.lineTo(x3, y3);
-        ctx.lineTo(x2, y2);
-        ctx.closePath();
-        ctx.clip();
-        ctx.beginPath();
-        ctx.rect(dirty.x, dirty.y, dirty.width, dirty.height);
-        ctx.clip();
-        {
-            const gradient = ctx.createLinearGradient(x2, y0, x3, y0);
-            gradient.addColorStop(0, colorStart);
-            gradient.addColorStop(1, colorEnd);
-            ctx.fillStyle = gradient;
-            ctx.fillRect(x2, y0, x3 - x2, y3 - y0);
-        }
-        ctx.restore();
-        ctx.save();
-        ctx.beginPath();
-        ctx.moveTo(x1, y2);
-        ctx.lineTo(x0, y3);
-        ctx.lineTo(x3, y3);
-        ctx.lineTo(x2, y2);
-        ctx.closePath();
-        ctx.clip();
-        ctx.beginPath();
-        ctx.rect(dirty.x, dirty.y, dirty.width, dirty.height);
-        ctx.clip();
-        {
-            const gradient = ctx.createLinearGradient(x0, y2, x0, y3);
-            gradient.addColorStop(0, colorStart);
-            gradient.addColorStop(1, colorEnd);
-            ctx.fillStyle = gradient;
-            ctx.fillRect(x0, y2, x3 - x0, y3 - y2);
-        }
-        ctx.restore();
-        ctx.save();
-        ctx.beginPath();
-        ctx.moveTo(x0, y0);
-        ctx.lineTo(x1, y1);
-        ctx.lineTo(x1, y2);
-        ctx.lineTo(x0, y3);
-        ctx.closePath();
-        ctx.clip();
-        ctx.beginPath();
-        ctx.rect(dirty.x, dirty.y, dirty.width, dirty.height);
-        ctx.clip();
-        {
-            const gradient = ctx.createLinearGradient(x1, y0, x0, y0);
-            gradient.addColorStop(0, colorStart);
-            gradient.addColorStop(1, colorEnd);
-            ctx.fillStyle = gradient;
-            ctx.fillRect(x0, y0, x1 - x0, y3 - y0);
-        }
+        ctx.fill(p);
+        ctx.shadowBlur = 0;
+        ctx.strokeStyle = "rgba(" + borderColor.join(",") + ")";
+        ctx.lineWidth = bw;
+        ctx.moveTo(x + r0, y - bw / 2);
+        ctx.lineTo(x + width - r1, y - bw / 2);
+        ctx.arcTo(x + width + bw / 2, y - bw / 2, x + width + bw / 2, y + r1, r1 + bw / 2);
+        ctx.lineTo(x + width + bw / 2, y + height - r2);
+        ctx.arcTo(x + width + bw / 2, y + height + bw / 2, x + width - r2, y + height + bw / 2, r2 + bw / 2);
+        ctx.lineTo(x + r3, y + height + bw / 2);
+        ctx.arcTo(x - bw / 2, y + height + bw / 2, x - bw / 2, y + height - r3, r3 + bw / 2);
+        ctx.lineTo(x - bw / 2, y + r0);
+        ctx.arcTo(x - bw / 2, y - bw / 2, x + r0, y - bw / 2, r0 + bw / 2);
+        ctx.stroke();
         ctx.restore();
     }
     redraw() {

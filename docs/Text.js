@@ -1,91 +1,61 @@
 import { Display } from "./Display.js";
-import { Fonts } from "./Font.js";
 import { View } from "./View.js";
-import { MouseUpEvent } from "./Event.js";
 export class Text extends View {
     constructor(config) {
         super(config);
         this.lines = [];
         this.content = this.children.join("");
-        this.font = Fonts.get(this.props.font);
-        this.unitsPerEm = this.font.unitsPerEm;
-        this.props.size;
-        this.scale = this.props.size / this.unitsPerEm;
     }
-    handle(e) {
-        if (e instanceof MouseUpEvent) {
-            console.log(this.content.split("").map((c) => this.font.glyphs[c]));
-            e.handled = true;
-        }
+    get font() {
+        const props = this.deviceProps;
+        return `${props.size}px ${props.fontFamily}`;
     }
+    handle(e) { }
     layout() {
         this.lines = [];
-        const words = this.content.split(/\s+/);
-        if (!words.length)
-            return;
-        const spaceWidth = this.props.size / 4;
-        const getGlyphWidth = (c) => this.font.glyphs[c].width * this.scale;
-        const getWordWidth = (word) => word.split("").reduce((w, c) => w + getGlyphWidth(c), 0);
-        let line = words.shift();
-        let lineWidth = getWordWidth(line);
-        for (let word of words) {
-            const wordWidth = getWordWidth(word);
-            if (lineWidth + spaceWidth + wordWidth > this.contentWidth) {
+        const props = this.deviceProps;
+        let line = "";
+        for (let c of this.content) {
+            if (this.getTextWidth(line + c) > this.contentWidth) {
                 this.lines.push(line);
-                line = word;
-                lineWidth = wordWidth;
+                line = "";
+                if (props.size * (this.lines.length + 1) > this.contentHeight)
+                    return;
             }
             else {
-                line += " " + word;
-                lineWidth += spaceWidth + wordWidth;
+                line += c;
             }
         }
         this.lines.push(line);
     }
-    drawGlyph(ctx, glyph) {
-        if (!this.font)
-            return;
-        ctx.beginPath();
-        for (let cmd of glyph.outline) {
-            switch (cmd.type) {
-                case "MOVE_TO":
-                    ctx.moveTo(cmd.x, glyph.height - cmd.y);
-                    break;
-                case "LINE_TO":
-                    ctx.lineTo(cmd.x, glyph.height - cmd.y);
-                    break;
-                case "QUADRATIC_BEZIER":
-                    ctx.quadraticCurveTo(cmd.cx, glyph.height - cmd.cy, cmd.x, glyph.height - cmd.y);
-                    break;
-                case "CLOSE_PATH":
-                    ctx.closePath();
-                    break;
-            }
-        }
-        ctx.fill();
+    getTextWidth(word) {
+        const ctx = Display.instance.ctx;
+        ctx.font = this.font;
+        const metrics = ctx.measureText(word);
+        return (Math.abs(metrics.actualBoundingBoxLeft) +
+            Math.abs(metrics.actualBoundingBoxRight));
     }
     draw(dirty) {
         super.draw(dirty);
+        const props = this.deviceProps;
         const ctx = Display.instance.ctx;
         ctx.save();
-        ctx.fillStyle = "rgba(" + this.props.color.join(",") + ")";
-        for (let [i, line] of this.lines.entries()) {
-            if (this.props.size * (i + 1) > this.contentHeight)
-                break;
-            ctx.setTransform(1, 0, 0, 1, 0, 0);
-            ctx.translate(this.frame.x + this.props.padding[3], this.frame.y + this.props.padding[0] + this.props.size * i);
-            ctx.scale(this.scale, this.scale);
-            for (let c of line) {
-                const glyph = this.font.glyphs[c];
-                if (glyph) {
-                    // TODO: kerning
-                    this.drawGlyph(ctx, glyph);
-                    ctx.translate(glyph.width, 0);
-                }
-                else {
-                    // TODO: spaces ?
-                    ctx.translate(this.unitsPerEm / 4, 0);
-                }
+        ctx.beginPath();
+        ctx.rect(dirty.x, dirty.y, dirty.width, dirty.height);
+        ctx.clip();
+        ctx.fillStyle = "rgba(" + props.color.join(",") + ")";
+        ctx.textBaseline = "top";
+        const fontSize = props.size;
+        if (this.props.textAlign == "center") {
+            ctx.textAlign = "center";
+            for (let [i, line] of this.lines.entries()) {
+                ctx.fillText(line, this.frame.x + this.frame.width / 2, this.frame.y + props.padding[0] + fontSize * i);
+            }
+        }
+        else {
+            ctx.textAlign = "left";
+            for (let [i, line] of this.lines.entries()) {
+                ctx.fillText(line, this.frame.x + props.padding[3], this.frame.y + props.padding[0] + fontSize * i);
             }
         }
         ctx.restore();

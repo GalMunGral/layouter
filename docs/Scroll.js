@@ -1,5 +1,4 @@
 import { Container } from "./Container.js";
-import { MouseDownEvent, MouseUpEvent } from "./Event.js";
 import { Point } from "./Geometry.js";
 import { Observable } from "./Observable.js";
 export class Scroll extends Container {
@@ -11,6 +10,7 @@ export class Scroll extends Container {
         this.mousePosition = new Point(0, 0);
         this.delta = 0;
         this.childMap = {};
+        this.isLayoutRoot = true;
         if (config.data instanceof Observable) {
             config.data.subscribe((v) => {
                 this.reload(v, config.renderItem);
@@ -55,22 +55,13 @@ export class Scroll extends Container {
     }
     handle(e) {
         super.handle(e);
-        if (e instanceof MouseDownEvent) {
-            this.scrolling = true;
-            this.mousePosition = e.point;
-            e.handled = true;
-        }
-        else if (e instanceof MouseUpEvent) {
-            this.scrolling = false;
-            const simulateInertia = () => {
-                if (!this.delta)
-                    return;
-                this.scroll(this.delta);
-                this.delta += this.delta > 0 ? -1 : 1;
-                setTimeout(simulateInertia, 16);
-            };
-            simulateInertia();
-            e.handled = true;
-        }
+        // const simulateInertia = () => {
+        //   if (!this.delta) return;
+        //   this.scroll(this.delta);
+        //   this.delta += this.delta > 0 ? -1 : 1;
+        //   setTimeout(simulateInertia, 16);
+        // };
+        // simulateInertia();
+        e.handled = true;
     }
 }

@@ -1,4 +1,4 @@
-import { Event, MouseClickEvent, MouseDownEvent, MouseMoveEvent, MouseUpEvent, } from "./Event.js";
+import { Event, MouseClickEvent, MouseDownEvent, MouseMoveEvent, MouseUpEvent, WheelEvent, } from "./Event.js";
 import { Point, Rect } from "./Geometry.js";
 export class Display {
     constructor(root) {
@@ -10,6 +10,7 @@ export class Display {
         document.body.style.margin = "0px";
         document.body.append(this.canvas);
         this.render();
+        console.log(this.root);
     }
     render() {
         this.canvas.width = window.innerWidth * window.devicePixelRatio;
@@ -46,6 +47,12 @@ export class Display {
             this.root.handle(evt);
             Event.previous = evt;
         });
+        window.onwheel = throttle((e) => {
+            const pos = new Point(e.clientX * window.devicePixelRatio, e.clientY * window.devicePixelRatio);
+            const evt = new WheelEvent(pos, e.deltaX * window.devicePixelRatio, e.deltaY * window.devicePixelRatio);
+            this.root.handle(evt);
+            Event.previous = evt;
+        }, 16);
     }
 }
 function debounce(f, timeout = 16) {
