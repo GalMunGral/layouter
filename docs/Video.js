@@ -11,7 +11,6 @@ export class Video extends View {
         const el = document.createElement("video");
         el.autoplay = true;
         el.onloadeddata = () => {
-            console.log("o");
             this.el = el;
         };
         el.onplay = () => {
@@ -30,7 +29,6 @@ export class Video extends View {
     layout() {
         if (!this.el)
             return;
-        console.log(this.el.videoHeight);
         if (this.objectFit == "contain") {
             const scale = Math.min(this.frame.width / this.el.videoWidth, this.frame.height / this.el.videoHeight);
             this.imageFrame.width = this.el.videoWidth * scale;
@@ -52,7 +50,6 @@ export class Video extends View {
         const ctx = Display.instance.ctx;
         ctx.save();
         super.draw(dirty);
-        // console.log(this.imageFrame);
         if (this.el) {
             if (this.objectFit == "contain") {
                 ctx.drawImage(this.el, this.imageFrame.x, this.imageFrame.y, this.imageFrame.width, this.imageFrame.height);

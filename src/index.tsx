@@ -1,6 +1,7 @@
 import { Display } from "./Display.js";
 import { HStack } from "./HStack.js";
 import { Image } from "./Image.js";
+import { Observable } from "./Observable.js";
 import { Text } from "./Text.js";
 import { Video } from "./Video.js";
 import { VScroll } from "./VScroll.js";
@@ -13,7 +14,7 @@ function Test<T>(type: new (p: T) => any, props: T, ...children: any[]) {
 new Display(
   (
     <VStack backgroundColor={[0, 0, 0, 1]}>
-      <VStack
+      <HStack
         dimension={[Infinity, 100]}
         backgroundColor={[255, 0, 0, 1]}
         margin={[10, 10, 10, 10]}
@@ -29,7 +30,21 @@ new Display(
           alsdkfja; lsdkfj alksdjf lskdjfkdjf sdf sdkfj skdjfwlek jwl sodifu
           wlekj lskdf uwoekrjfl kjsdlf iu
         </Text>
-      </VStack>
+        <Video
+          visible={
+            new Observable((h) => {
+              let v = false;
+              setInterval(() => {
+                h((v = !v));
+              }, 800);
+            })
+          }
+          backgroundColor={[255, 255, 255, 0.5]}
+          dimension={[500, 300]}
+          objectFit="contain"
+          url="test.mp4"
+        />
+      </HStack>
       <VStack
         dimension={[Infinity, 100]}
         backgroundColor={[0, 0, 0, 1]}
@@ -60,32 +75,43 @@ new Display(
               wlekj lskdf uwoekrjfl kjsdlf iu
             </Text>
           </VStack>
-          <Video
-            backgroundColor={[255, 255, 255, 0.5]}
-            dimension={[500, 300]}
-            objectFit="contain"
-            url="test.mp4"
-          />
+
           <VScroll
             dimension={[100, Infinity]}
             weight={1}
             backgroundColor={[255, 244, 100, 1]}
-            data={Array(30)
-              .fill(0)
-              .map((_, i) => ({
-                id: String(i),
-                name: "asdfasfadfaf",
-              }))}
-            renderItem={({ name }) => {
+            data={
+              new Observable<Array<{ id: string }>>((f) => {
+                let arr = Array(30)
+                  .fill(0)
+                  .map((_, i) => ({
+                    id: String(i),
+                  }));
+                setInterval(() => {
+                  arr.push(arr.shift()!);
+                  f(arr);
+                }, 30);
+              })
+            }
+            renderItem={({ id }) => {
               return (
-                <Image
-                  margin={[10, 10, 10, 10]}
-                  dimension={[200, 100]}
+                <Text
                   backgroundColor={[255, 255, 255, 1]}
+                  margin={[5, 5, 5, 5 * Number(id)]}
                   padding={[10, 10, 10, 10]}
-                  objectFit="cover"
-                  url="https://i.ytimg.com/vi/xGr53sCo62c/hqdefault.jpg"
-                />
+                  dimension={[Infinity, 50]}
+                  fontFamily="Arial"
+                >
+                  this is {id}
+                </Text>
+                // <Image
+                //   margin={[10, 10, 10, 10]}
+                //   dimension={[200, 100]}
+                //   backgroundColor={[255, 255, 255, 1]}
+                //   padding={[10, 10, 10, 10]}
+                //   objectFit="cover"
+                //   url="https://i.ytimg.com/vi/xGr53sCo62c/hqdefault.jpg"
+                // />
               );
             }}
           />

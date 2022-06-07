@@ -12,7 +12,7 @@ export class HScroll extends Scroll {
         let x = this.frame.x + this.offset;
         let y = this.frame.y;
         let contentWidth = 0;
-        for (let child of this.children) {
+        for (let child of this.visibleChildren) {
             let [width, height] = child.deviceProps.dimension;
             let [top, right, bottom, left] = child.deviceProps.margin.map((x) => Math.max(0, x));
             child.frame.x = x + left;

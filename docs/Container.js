@@ -10,7 +10,7 @@ export class Container extends View {
     }
     handle(e) {
         var _a, _b;
-        for (let child of this.children) {
+        for (let child of this.visibleChildren) {
             if (child.frame.includes(e.point)) {
                 if (!child.frame.includes((_a = Event.previous) === null || _a === void 0 ? void 0 : _a.point)) {
                     child.handle(new MouseEnterEvent(e.point));
@@ -30,8 +30,11 @@ export class Container extends View {
         //   e.handled = true;
         // }
     }
+    get visibleChildren() {
+        return this.children.filter((c) => c.props.visible);
+    }
     layoutChildren() {
-        for (let child of this.children) {
+        for (let child of this.visibleChildren) {
             child.visible = child.outerFrame.intersect(this.visible);
             child.layout();
         }
@@ -40,7 +43,7 @@ export class Container extends View {
         const ctx = Display.instance.ctx;
         ctx.save();
         super.draw(dirty);
-        for (let child of this.children) {
+        for (let child of this.visibleChildren) {
             const d = dirty.intersect(child.visible);
             if (d)
                 child.draw(d);

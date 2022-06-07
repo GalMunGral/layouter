@@ -8,6 +8,7 @@ export type vec4 = [number, number, number, number];
 export type vec2 = [number, number];
 
 export type ViewProps = {
+  visible: boolean;
   dimension: vec2;
   margin: vec4;
   weight: number;
@@ -38,6 +39,7 @@ export class View<C = any> {
   public children: Array<C> = [];
 
   private _props: ViewProps = {
+    visible: true,
     dimension: [0, 0],
     margin: [0, 0, 0, 0],
     weight: 1,
@@ -73,7 +75,7 @@ export class View<C = any> {
   }
 
   get deviceProps(): ViewProps {
-    const props = JSON.parse(JSON.stringify(this.props));
+    const props = clone(this.props);
     for (let key of ["borderWidth", "shadowBlur", "size"]) {
       props[key] *= window.devicePixelRatio;
     }
@@ -98,7 +100,12 @@ export class View<C = any> {
           return Reflect.set(target, prop, value, receiver);
         } finally {
           if (view) {
-            if (prop == "dimension" || prop == "margin" || prop == "weight") {
+            if (
+              prop == "visible" ||
+              prop == "dimension" ||
+              prop == "margin" ||
+              prop == "weight"
+            ) {
               let cur: View = view;
               const root = Display.instance.root;
               while (cur != root && !cur.isLayoutRoot) cur = cur.parent!;
@@ -209,4 +216,16 @@ export class View<C = any> {
   }
 
   public destruct(): void {}
+}
+
+function clone(o: any) {
+  const res: any = {};
+  for (let key of Object.keys(o)) {
+    if (Array.isArray(key)) {
+      res[key] = [...o[key]];
+    } else {
+      res[key] = o[key];
+    }
+  }
+  return res;
 }

@@ -18,7 +18,6 @@ export class Video extends View {
     const el = document.createElement("video");
     el.autoplay = true;
     el.onloadeddata = () => {
-      console.log("o");
       this.el = el;
     };
     el.onplay = () => {
@@ -37,7 +36,6 @@ export class Video extends View {
 
   public override layout(): void {
     if (!this.el) return;
-    console.log(this.el.videoHeight);
 
     if (this.objectFit == "contain") {
       const scale = Math.min(
@@ -66,7 +64,6 @@ export class Video extends View {
     const ctx = Display.instance.ctx;
     ctx.save();
     super.draw(dirty);
-    // console.log(this.imageFrame);
     if (this.el) {
       if (this.objectFit == "contain") {
         ctx.drawImage(

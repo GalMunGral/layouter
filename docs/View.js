@@ -9,6 +9,7 @@ export class View {
         this.isLayoutRoot = false;
         this.children = [];
         this._props = {
+            visible: true,
             dimension: [0, 0],
             margin: [0, 0, 0, 0],
             weight: 1,
@@ -42,7 +43,7 @@ export class View {
         }
     }
     get deviceProps() {
-        const props = JSON.parse(JSON.stringify(this.props));
+        const props = clone(this.props);
         for (let key of ["borderWidth", "shadowBlur", "size"]) {
             props[key] *= window.devicePixelRatio;
         }
@@ -68,7 +69,10 @@ export class View {
                 }
                 finally {
                     if (view) {
-                        if (prop == "dimension" || prop == "margin" || prop == "weight") {
+                        if (prop == "visible" ||
+                            prop == "dimension" ||
+                            prop == "margin" ||
+                            prop == "weight") {
                             let cur = view;
                             const root = Display.instance.root;
                             while (cur != root && !cur.isLayoutRoot)
@@ -144,4 +148,16 @@ export class View {
         }
     }
     destruct() { }
+}
+function clone(o) {
+    const res = {};
+    for (let key of Object.keys(o)) {
+        if (Array.isArray(key)) {
+            res[key] = [...o[key]];
+        }
+        else {
+            res[key] = o[key];
+        }
+    }
+    return res;
 }

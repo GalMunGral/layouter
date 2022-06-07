@@ -19,7 +19,7 @@ export abstract class Container extends View<View> {
   }
 
   override handle(e: Event): void {
-    for (let child of this.children) {
+    for (let child of this.visibleChildren) {
       if (child.frame.includes(e.point)) {
         if (!child.frame.includes(Event.previous?.point)) {
           child.handle(new MouseEnterEvent(e.point));
@@ -39,8 +39,11 @@ export abstract class Container extends View<View> {
     // }
   }
 
+  protected get visibleChildren() {
+    return this.children.filter((c) => c.props.visible);
+  }
   protected layoutChildren() {
-    for (let child of this.children) {
+    for (let child of this.visibleChildren) {
       child.visible = child.outerFrame.intersect(this.visible);
       child.layout();
     }
@@ -50,7 +53,7 @@ export abstract class Container extends View<View> {
     const ctx = Display.instance.ctx;
     ctx.save();
     super.draw(dirty);
-    for (let child of this.children) {
+    for (let child of this.visibleChildren) {
       const d = dirty.intersect(child.visible);
       if (d) child.draw(d);
     }

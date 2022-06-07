@@ -12,7 +12,7 @@ export class VScroll extends Scroll {
         let x = this.frame.x;
         let y = this.frame.y + this.offset;
         let contentHeight = 0;
-        for (let child of this.children) {
+        for (let child of this.visibleChildren) {
             let [width, height] = child.deviceProps.dimension;
             let [top, right, bottom, left] = child.deviceProps.margin.map((x) => Math.max(0, x));
             child.frame.x = x + left;
