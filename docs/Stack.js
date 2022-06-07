@@ -1,48 +1,41 @@
 import { Container } from "./Container.js";
 export class Stack extends Container {
     finalize(child) {
-        const { frame, props } = child;
+        const { frame, outerFrame, props } = child;
         let [width, height] = props.dimension;
         const [top, right, bottom, left] = props.margin;
         if (top > -1 && bottom > -1) {
-            frame.height = frame.height - top - bottom;
-            frame.y += top;
+            frame.y = outerFrame.y + top;
+            frame.height = outerFrame.height - top - bottom;
         }
         else if (top > -1) {
-            frame.height = Math.min(height, frame.height - top);
-            frame.y += top;
+            frame.y = outerFrame.y + top;
+            frame.height = Math.min(height, outerFrame.height - top);
         }
         else if (bottom > -1) {
-            height = Math.min(height, frame.height - bottom);
-            const top = frame.height - height - bottom;
-            frame.height = height;
-            frame.y += top;
+            frame.height = Math.min(height, outerFrame.height - bottom);
+            frame.y = outerFrame.y + outerFrame.height - bottom - frame.height;
         }
         else {
-            height = Math.min(height, frame.height);
-            const top = Math.floor((frame.height - height) / 2);
-            frame.height = height;
-            frame.y += top;
+            frame.height = Math.min(height, outerFrame.height);
+            frame.y =
+                outerFrame.y + Math.floor((outerFrame.height - frame.height) / 2);
         }
         if (left > -1 && right > -1) {
-            frame.width = frame.width - left - right;
-            frame.x += left;
+            frame.width = outerFrame.width - left - right;
+            frame.x = outerFrame.x + left;
         }
         else if (left > -1) {
-            frame.width = Math.min(width, frame.width - top);
-            frame.x += top;
+            frame.width = Math.min(width, outerFrame.width - left);
+            frame.x = outerFrame.x + left;
         }
         else if (right > -1) {
-            width = Math.min(width, frame.width - right);
-            const left = frame.width - width - right;
-            frame.width = width;
-            frame.x += left;
+            frame.width = Math.min(width, outerFrame.width - right);
+            frame.x = outerFrame.x + outerFrame.width - right - frame.width;
         }
         else {
-            width = Math.min(width, frame.width);
-            const left = Math.floor((frame.width - width) / 2);
-            frame.width = width;
-            frame.x += left;
+            frame.width = Math.min(width, outerFrame.width);
+            frame.x = outerFrame.x + Math.floor((outerFrame.width - frame.width) / 2);
         }
     }
 }

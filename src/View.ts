@@ -29,6 +29,7 @@ export type ViewConfig<C = any> = Partial<{
 
 export abstract class View<C = any> {
   public frame: Rect = new Rect(0, 0, 0, 0);
+  public outerFrame: Rect = new Rect(0, 0, 0, 0);
   public visible: Rect | null = null;
   public parent?: View<any>;
   public children: Array<C> = [];
@@ -106,19 +107,8 @@ export abstract class View<C = any> {
 
   public draw(dirty: Rect): void {
     const ctx = Display.instance.ctx;
-    ctx.save();
-
-    ctx.beginPath();
-    ctx.rect(dirty.x, dirty.y, dirty.width, dirty.height);
-    ctx.clip();
-
-    ctx.fillStyle = "rgba(" + this.props.backgroundColor.join(",") + ")";
-    const { x, y, width, height } = this.frame;
-    ctx.fillRect(x, y, width, height);
-    ctx.restore();
-
-    // TODO: SHADOWS
     const { shadowColor, shadowWidth } = this.props;
+    const { x, y, width, height } = this.frame;
     const colorStart = "rgba(" + shadowColor.join(",") + ")";
     const colorEnd = "rgba(" + shadowColor.slice(0, 3).join(",") + ",0)";
     const x0 = x - shadowWidth[3];
@@ -132,11 +122,22 @@ export abstract class View<C = any> {
 
     ctx.save();
     ctx.beginPath();
+    ctx.rect(dirty.x, dirty.y, dirty.width, dirty.height);
+    ctx.clip();
+    ctx.fillStyle = "rgba(" + this.props.backgroundColor.join(",") + ")";
+    ctx.fillRect(x, y, width, height);
+    ctx.restore();
+
+    ctx.save();
+    ctx.beginPath();
     ctx.moveTo(x0, y0);
     ctx.lineTo(x3, y0);
     ctx.lineTo(x2, y1);
     ctx.lineTo(x1, y1);
     ctx.closePath();
+    ctx.clip();
+    ctx.beginPath();
+    ctx.rect(dirty.x, dirty.y, dirty.width, dirty.height);
     ctx.clip();
     {
       const gradient = ctx.createLinearGradient(x0, y1, x0, y0);
@@ -155,6 +156,9 @@ export abstract class View<C = any> {
     ctx.lineTo(x2, y2);
     ctx.closePath();
     ctx.clip();
+    ctx.beginPath();
+    ctx.rect(dirty.x, dirty.y, dirty.width, dirty.height);
+    ctx.clip();
     {
       const gradient = ctx.createLinearGradient(x2, y0, x3, y0);
       gradient.addColorStop(0, colorStart);
@@ -172,6 +176,9 @@ export abstract class View<C = any> {
     ctx.lineTo(x2, y2);
     ctx.closePath();
     ctx.clip();
+    ctx.beginPath();
+    ctx.rect(dirty.x, dirty.y, dirty.width, dirty.height);
+    ctx.clip();
     {
       const gradient = ctx.createLinearGradient(x0, y2, x0, y3);
       gradient.addColorStop(0, colorStart);
@@ -188,6 +195,9 @@ export abstract class View<C = any> {
     ctx.lineTo(x1, y2);
     ctx.lineTo(x0, y3);
     ctx.closePath();
+    ctx.clip();
+    ctx.beginPath();
+    ctx.rect(dirty.x, dirty.y, dirty.width, dirty.height);
     ctx.clip();
     {
       const gradient = ctx.createLinearGradient(x1, y0, x0, y0);

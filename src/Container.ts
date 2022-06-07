@@ -41,7 +41,7 @@ export abstract class Container extends View<View> {
 
   protected layoutChildren() {
     for (let child of this.children) {
-      child.visible = child.frame.intersect(this.visible);
+      child.visible = child.outerFrame.intersect(this.visible);
       child.layout();
     }
   }

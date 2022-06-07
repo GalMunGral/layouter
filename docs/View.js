@@ -5,6 +5,7 @@ import { Scroll } from "./Scroll.js";
 export class View {
     constructor(config) {
         this.frame = new Rect(0, 0, 0, 0);
+        this.outerFrame = new Rect(0, 0, 0, 0);
         this.visible = null;
         this.children = [];
         this._props = {
@@ -77,16 +78,8 @@ export class View {
     }
     draw(dirty) {
         const ctx = Display.instance.ctx;
-        ctx.save();
-        ctx.beginPath();
-        ctx.rect(dirty.x, dirty.y, dirty.width, dirty.height);
-        ctx.clip();
-        ctx.fillStyle = "rgba(" + this.props.backgroundColor.join(",") + ")";
-        const { x, y, width, height } = this.frame;
-        ctx.fillRect(x, y, width, height);
-        ctx.restore();
-        // TODO: SHADOWS
         const { shadowColor, shadowWidth } = this.props;
+        const { x, y, width, height } = this.frame;
         const colorStart = "rgba(" + shadowColor.join(",") + ")";
         const colorEnd = "rgba(" + shadowColor.slice(0, 3).join(",") + ",0)";
         const x0 = x - shadowWidth[3];
@@ -99,11 +92,21 @@ export class View {
         const y3 = y + height + shadowWidth[2];
         ctx.save();
         ctx.beginPath();
+        ctx.rect(dirty.x, dirty.y, dirty.width, dirty.height);
+        ctx.clip();
+        ctx.fillStyle = "rgba(" + this.props.backgroundColor.join(",") + ")";
+        ctx.fillRect(x, y, width, height);
+        ctx.restore();
+        ctx.save();
+        ctx.beginPath();
         ctx.moveTo(x0, y0);
         ctx.lineTo(x3, y0);
         ctx.lineTo(x2, y1);
         ctx.lineTo(x1, y1);
         ctx.closePath();
+        ctx.clip();
+        ctx.beginPath();
+        ctx.rect(dirty.x, dirty.y, dirty.width, dirty.height);
         ctx.clip();
         {
             const gradient = ctx.createLinearGradient(x0, y1, x0, y0);
@@ -121,6 +124,9 @@ export class View {
         ctx.lineTo(x2, y2);
         ctx.closePath();
         ctx.clip();
+        ctx.beginPath();
+        ctx.rect(dirty.x, dirty.y, dirty.width, dirty.height);
+        ctx.clip();
         {
             const gradient = ctx.createLinearGradient(x2, y0, x3, y0);
             gradient.addColorStop(0, colorStart);
@@ -137,6 +143,9 @@ export class View {
         ctx.lineTo(x2, y2);
         ctx.closePath();
         ctx.clip();
+        ctx.beginPath();
+        ctx.rect(dirty.x, dirty.y, dirty.width, dirty.height);
+        ctx.clip();
         {
             const gradient = ctx.createLinearGradient(x0, y2, x0, y3);
             gradient.addColorStop(0, colorStart);
@@ -152,6 +161,9 @@ export class View {
         ctx.lineTo(x1, y2);
         ctx.lineTo(x0, y3);
         ctx.closePath();
+        ctx.clip();
+        ctx.beginPath();
+        ctx.rect(dirty.x, dirty.y, dirty.width, dirty.height);
         ctx.clip();
         {
             const gradient = ctx.createLinearGradient(x1, y0, x0, y0);

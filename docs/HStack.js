@@ -6,9 +6,9 @@ export class HStack extends Stack {
         this.allocateWidth();
         let x = this.frame.x;
         for (let child of this.children) {
-            child.frame.height = this.frame.height;
-            child.frame.y = this.frame.y;
-            child.frame.x = x;
+            child.outerFrame.height = this.frame.height;
+            child.outerFrame.y = this.frame.y;
+            child.outerFrame.x = x;
             x += child.frame.width;
         }
         for (let child of this.children) {
@@ -29,10 +29,10 @@ export class HStack extends Stack {
             const props = child.props;
             let extra = Math.round((total * props.weight) / totalWeight);
             rem -= extra;
-            child.frame.width = props.dimension[0] + extra;
+            child.outerFrame.width = props.dimension[0] + extra;
         }
         if (rem) {
-            this.children[this.children.length - 1].frame.width += rem;
+            this.children[this.children.length - 1].outerFrame.width += rem;
         }
     }
 }

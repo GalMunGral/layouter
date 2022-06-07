@@ -7,10 +7,10 @@ export class VStack extends Stack {
 
     let y = this.frame.y;
     for (let child of this.children) {
-      child.frame.width = this.frame.width;
-      child.frame.x = this.frame.x;
-      child.frame.y = y;
-      y += child.frame.height;
+      child.outerFrame.width = this.frame.width;
+      child.outerFrame.x = this.frame.x;
+      child.outerFrame.y = y;
+      y += child.outerFrame.height;
     }
 
     for (let child of this.children) {
@@ -33,10 +33,10 @@ export class VStack extends Stack {
       const props = child.props;
       let extra = Math.round((total * props.weight!) / totalWeight);
       rem -= extra;
-      child.frame.height = props.dimension![1] + extra;
+      child.outerFrame.height = props.dimension![1] + extra;
     }
     if (rem) {
-      this.children[this.children.length - 1].frame.height += rem;
+      this.children[this.children.length - 1].outerFrame.height += rem;
     }
   }
 }

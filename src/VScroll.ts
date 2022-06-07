@@ -24,9 +24,13 @@ export class VScroll<T extends { id: string }> extends Scroll<T> {
       child.frame.x = x + left;
       child.frame.y = y + top;
       child.frame.width = Math.min(width, this.frame.width - left - right);
-      child.frame.height = height - top - bottom;
-      y += height;
-      contentHeight += height;
+      child.frame.height = height;
+      child.outerFrame.x = x;
+      child.outerFrame.y = y;
+      child.outerFrame.width = child.frame.width + left + right;
+      child.outerFrame.height = height + top + bottom;
+      y += child.outerFrame.height;
+      contentHeight += child.outerFrame.height;
     }
     this.minOffset = this.frame.height - contentHeight;
     this.layoutChildren();
