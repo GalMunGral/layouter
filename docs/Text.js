@@ -18,7 +18,7 @@ export class Text extends View {
         for (let c of this.content) {
             if (this.getTextWidth(line + c) > this.contentWidth) {
                 this.lines.push(line);
-                line = "";
+                line = c;
                 if (props.size * (this.lines.length + 1) > this.contentHeight)
                     return;
             }
@@ -28,34 +28,31 @@ export class Text extends View {
         }
         this.lines.push(line);
     }
-    getTextWidth(word) {
+    getTextWidth(s) {
         const ctx = Display.instance.ctx;
         ctx.font = this.font;
-        const metrics = ctx.measureText(word);
+        const metrics = ctx.measureText(s);
         return (Math.abs(metrics.actualBoundingBoxLeft) +
             Math.abs(metrics.actualBoundingBoxRight));
     }
     draw(dirty) {
-        super.draw(dirty);
-        const props = this.deviceProps;
         const ctx = Display.instance.ctx;
         ctx.save();
-        ctx.beginPath();
-        ctx.rect(dirty.x, dirty.y, dirty.width, dirty.height);
-        ctx.clip();
+        super.draw(dirty);
+        const props = this.deviceProps;
+        ctx.font = this.font;
         ctx.fillStyle = "rgba(" + props.color.join(",") + ")";
         ctx.textBaseline = "top";
-        const fontSize = props.size;
         if (this.props.textAlign == "center") {
             ctx.textAlign = "center";
             for (let [i, line] of this.lines.entries()) {
-                ctx.fillText(line, this.frame.x + this.frame.width / 2, this.frame.y + props.padding[0] + fontSize * i);
+                ctx.fillText(line, this.frame.x + this.frame.width / 2, this.frame.y + props.padding[0] + props.size * i);
             }
         }
         else {
             ctx.textAlign = "left";
             for (let [i, line] of this.lines.entries()) {
-                ctx.fillText(line, this.frame.x + props.padding[3], this.frame.y + props.padding[0] + fontSize * i);
+                ctx.fillText(line, this.frame.x + props.padding[3], this.frame.y + props.padding[0] + props.size * i);
             }
         }
         ctx.restore();

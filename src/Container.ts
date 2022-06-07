@@ -6,6 +6,7 @@ import {
   MouseEnterEvent,
   MouseExitEvent,
 } from "./Event.js";
+import { Display } from "./Display.js";
 
 export interface StyleConfig {}
 
@@ -46,11 +47,14 @@ export abstract class Container extends View<View> {
   }
 
   override draw(dirty: Rect) {
+    const ctx = Display.instance.ctx;
+    ctx.save();
     super.draw(dirty);
     for (let child of this.children) {
       const d = dirty.intersect(child.visible);
       if (d) child.draw(d);
     }
+    ctx.restore();
   }
 
   public override destruct(): void {

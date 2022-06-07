@@ -47,10 +47,15 @@ new Display(
             borderRadius={[10, 10, 10, 10]}
             weight={2}
           >
-            <Text size={20} padding={[10, 10, 10, 10]} textAlign="start">
-              啦啦啦 TEST sdfsdf asdf asldkfj asd lasdjflaksd jflaksdjf; alk
-              sdf; alsdkfja; lsdkfj alksdjf lskdjfkdjf sdf sdkfj skdjfwlek jwl
-              sodifu wlekj lskdf uwoekrjfl kjsdlf iu
+            <Text
+              fontFamily="Times New Roman"
+              size={20}
+              padding={[10, 10, 10, 10]}
+              textAlign="start"
+            >
+              啦啦啦 TEST sdfsdf asdf asldkfj asd lasdjflaksd jflaksdjf; sdf;
+              alsdkfja; lsdkfj alksdjf lskdjfkdjf sdf sdkfj skdjfwlek jwl sodifu
+              wlekj lskdf uwoekrjfl kjsdlf iu
             </Text>
           </VStack>
           <Text

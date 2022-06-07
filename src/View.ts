@@ -142,31 +142,21 @@ export abstract class View<C = any> {
     } = this.deviceProps;
     const { x, y, width, height } = this.frame;
     const [r0, r1, r2, r3] = borderRadius;
-    const p = new Path2D();
-    p.moveTo(x + r0, y);
-    p.lineTo(x + width - r1, y);
-    p.arcTo(x + width, y, x + width, y + r1, r1);
-    p.lineTo(x + width, y + height - r2);
-    p.arcTo(x + width, y + height, x + width - r2, y + height, r2);
-    p.lineTo(x + r3, y + height);
-    p.arcTo(x, y + height, x, y + height - r3, r3);
-    p.lineTo(x, y + r0);
-    p.arcTo(x, y, x + r0, y, r0);
 
-    ctx.save();
     ctx.beginPath();
     ctx.rect(dirty.x, dirty.y, dirty.width, dirty.height);
     ctx.clip();
-    ctx.fillStyle = "rgba(" + backgroundColor.join(",") + ")";
+
     ctx.shadowColor = "rgba(" + shadowColor.join(",") + ")";
     ctx.shadowBlur = shadowBlur;
     ctx.shadowOffsetX = shadowOffset[0];
     ctx.shadowOffsetY = shadowOffset[1];
-    ctx.beginPath();
-    ctx.fill(p);
+    ctx.fillStyle = "rgba(" + backgroundColor.join(",") + ")";
+
     ctx.shadowBlur = 0;
     ctx.strokeStyle = "rgba(" + borderColor.join(",") + ")";
     ctx.lineWidth = bw;
+    ctx.beginPath();
     ctx.moveTo(x + r0, y - bw / 2);
     ctx.lineTo(x + width - r1, y - bw / 2);
     ctx.arcTo(
@@ -195,7 +185,19 @@ export abstract class View<C = any> {
     ctx.lineTo(x - bw / 2, y + r0);
     ctx.arcTo(x - bw / 2, y - bw / 2, x + r0, y - bw / 2, r0 + bw / 2);
     ctx.stroke();
-    ctx.restore();
+
+    const p = new Path2D();
+    p.moveTo(x + r0, y);
+    p.lineTo(x + width - r1, y);
+    p.arcTo(x + width, y, x + width, y + r1, r1);
+    p.lineTo(x + width, y + height - r2);
+    p.arcTo(x + width, y + height, x + width - r2, y + height, r2);
+    p.lineTo(x + r3, y + height);
+    p.arcTo(x, y + height, x, y + height - r3, r3);
+    p.lineTo(x, y + r0);
+    p.arcTo(x, y, x + r0, y, r0);
+    ctx.fill(p);
+    ctx.clip(p);
   }
 
   public abstract handle(e: Event): void;

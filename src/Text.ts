@@ -29,7 +29,7 @@ export class Text extends View<string> {
     for (let c of this.content) {
       if (this.getTextWidth(line + c) > this.contentWidth) {
         this.lines.push(line);
-        line = "";
+        line = c;
         if (props.size * (this.lines.length + 1) > this.contentHeight) return;
       } else {
         line += c;
@@ -38,10 +38,10 @@ export class Text extends View<string> {
     this.lines.push(line);
   }
 
-  private getTextWidth(word: string): number {
+  private getTextWidth(s: string): number {
     const ctx = Display.instance.ctx;
     ctx.font = this.font;
-    const metrics = ctx.measureText(word);
+    const metrics = ctx.measureText(s);
     return (
       Math.abs(metrics.actualBoundingBoxLeft) +
       Math.abs(metrics.actualBoundingBoxRight)
@@ -49,23 +49,20 @@ export class Text extends View<string> {
   }
 
   override draw(dirty: Rect) {
-    super.draw(dirty);
-    const props = this.deviceProps;
     const ctx = Display.instance.ctx;
     ctx.save();
-    ctx.beginPath();
-    ctx.rect(dirty.x, dirty.y, dirty.width, dirty.height);
-    ctx.clip();
+    super.draw(dirty);
+    const props = this.deviceProps;
+    ctx.font = this.font;
     ctx.fillStyle = "rgba(" + props.color.join(",") + ")";
     ctx.textBaseline = "top";
-    const fontSize = props.size;
     if (this.props.textAlign == "center") {
       ctx.textAlign = "center";
       for (let [i, line] of this.lines.entries()) {
         ctx.fillText(
           line,
           this.frame.x + this.frame.width / 2,
-          this.frame.y + props.padding[0] + fontSize * i
+          this.frame.y + props.padding[0] + props.size * i
         );
       }
     } else {
@@ -74,7 +71,7 @@ export class Text extends View<string> {
         ctx.fillText(
           line,
           this.frame.x + props.padding[3],
-          this.frame.y + props.padding[0] + fontSize * i
+          this.frame.y + props.padding[0] + props.size * i
         );
       }
     }
