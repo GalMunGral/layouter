@@ -29,7 +29,7 @@ export type ViewConfig<C = any> = Partial<{
   [K in keyof ViewProps]: ViewProps[K] | Observable<ViewProps[K]>;
 }> & { children?: Array<C> };
 
-export abstract class View<C = any> {
+export class View<C = any> {
   public frame: Rect = new Rect(0, 0, 0, 0);
   public outerFrame: Rect = new Rect(0, 0, 0, 0);
   public visible: Rect | null = null;
@@ -127,7 +127,7 @@ export abstract class View<C = any> {
     return this.frame.height - props.padding[0] - props.padding[2];
   }
 
-  public abstract layout(): void;
+  public layout(): void {}
 
   public draw(dirty: Rect): void {
     const ctx = Display.instance.ctx;
@@ -200,11 +200,13 @@ export abstract class View<C = any> {
     ctx.clip(p);
   }
 
-  public abstract handle(e: Event): void;
+  public handle(e: Event): void {}
+
   public redraw(): void {
     if (this.visible) {
       Display.instance.root.draw(this.visible);
     }
   }
+
   public destruct(): void {}
 }

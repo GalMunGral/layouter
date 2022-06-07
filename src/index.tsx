@@ -1,6 +1,8 @@
 import { Display } from "./Display.js";
 import { HStack } from "./HStack.js";
+import { Image } from "./Image.js";
 import { Text } from "./Text.js";
+import { Video } from "./Video.js";
 import { VScroll } from "./VScroll.js";
 import { VStack } from "./VStack.js";
 
@@ -58,16 +60,12 @@ new Display(
               wlekj lskdf uwoekrjfl kjsdlf iu
             </Text>
           </VStack>
-          <Text
-            size={20}
-            margin={[20, 20, 10, 10]}
-            dimension={[200, 100]}
-            padding={[10, 10, 10, 10]}
-            textAlign="start"
-            color={[0, 0, 0, 1]}
-          >
-            heysssss {name}
-          </Text>
+          <Video
+            backgroundColor={[255, 255, 255, 0.5]}
+            dimension={[500, 300]}
+            objectFit="contain"
+            url="test.mp4"
+          />
           <VScroll
             dimension={[100, Infinity]}
             weight={1}
@@ -80,17 +78,14 @@ new Display(
               }))}
             renderItem={({ name }) => {
               return (
-                <Text
-                  backgroundColor={[0, 255, 0, 1]}
+                <Image
                   margin={[10, 10, 10, 10]}
-                  size={20}
-                  dimension={[200, 40]}
+                  dimension={[200, 100]}
+                  backgroundColor={[255, 255, 255, 1]}
                   padding={[10, 10, 10, 10]}
-                  textAlign="start"
-                  color={[0, 0, 0, 1]}
-                >
-                  heysssss {name}
-                </Text>
+                  objectFit="cover"
+                  url="https://i.ytimg.com/vi/xGr53sCo62c/hqdefault.jpg"
+                />
               );
             }}
           />

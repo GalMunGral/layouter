@@ -96,6 +96,7 @@ export class View {
         const props = this.deviceProps;
         return this.frame.height - props.padding[0] - props.padding[2];
     }
+    layout() { }
     draw(dirty) {
         const ctx = Display.instance.ctx;
         const { backgroundColor, borderColor, shadowColor, shadowOffset, shadowBlur, borderWidth: bw, borderRadius, } = this.deviceProps;
@@ -136,6 +137,7 @@ export class View {
         ctx.fill(p);
         ctx.clip(p);
     }
+    handle(e) { }
     redraw() {
         if (this.visible) {
             Display.instance.root.draw(this.visible);
