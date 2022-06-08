@@ -69,7 +69,7 @@ export class View {
                     return Reflect.set(target, prop, value, receiver);
                 }
                 finally {
-                    if (view) {
+                    if (Display.instance) {
                         if (prop == "visible" ||
                             prop == "dimension" ||
                             prop == "margin" ||

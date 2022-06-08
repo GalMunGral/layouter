@@ -100,7 +100,7 @@ export class View<C = any> {
         try {
           return Reflect.set(target, prop, value, receiver);
         } finally {
-          if (view) {
+          if (Display.instance) {
             if (
               prop == "visible" ||
               prop == "dimension" ||
