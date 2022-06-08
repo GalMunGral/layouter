@@ -2,8 +2,8 @@ import { Path } from "../Path.js";
 import { createElement } from "../util.js";
 import { VStack } from "../VStack.js";
 export function Logo() {
-    return (createElement(VStack, { weight: 0, dimension: [Infinity, 90] },
-        createElement(Path, { dimension: [131, 40], color: [255, 255, 255, 1], margin: [-1, -1, -1, 24], paths: [
+    return (createElement(VStack, { dimension: [Infinity, 90] },
+        createElement(Path, { weight: 1, dimension: [131, 40], color: [255, 255, 255, 1], margin: [-1, -1, -1, 24], paths: [
                 {
                     width: 1134,
                     height: 340,

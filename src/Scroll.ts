@@ -65,6 +65,5 @@ export abstract class Scroll<T extends { id: string }> extends Container {
 
   handle(e: Event): void {
     super.handle(e);
-    e.handled = true;
   }
 }

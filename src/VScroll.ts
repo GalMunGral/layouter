@@ -4,7 +4,8 @@ import { Scroll } from "./Scroll.js";
 export class VScroll<T extends { id: string }> extends Scroll<T> {
   handle(e: Event): void {
     super.handle(e);
-    if (e instanceof WheelEvent) {
+    if (e.handled) return;
+    if (e instanceof WheelEvent && Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
       this.scroll(-e.deltaY);
       e.handled = true;
     }
@@ -30,7 +31,7 @@ export class VScroll<T extends { id: string }> extends Scroll<T> {
       y += child.outerFrame.height;
       contentHeight += child.outerFrame.height;
     }
-    this.minOffset = this.frame.height - contentHeight;
+    this.minOffset = Math.min(this.frame.height - contentHeight, 0);
     this.layoutChildren();
   }
 }

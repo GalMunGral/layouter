@@ -23,7 +23,6 @@ export class VStack extends Stack {
             const props = child.deviceProps;
             total -= Math.min(props.dimension[1], this.frame.height);
             totalWeight += props.weight;
-            console.log(props.weight, totalWeight);
         }
         let rem = total;
         for (let child of this.visibleChildren) {

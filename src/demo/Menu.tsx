@@ -83,19 +83,18 @@ type MenuButtonConfig = {
 function MenuButton({ icon, title, color, onClick }: MenuButtonConfig) {
   return (
     <HStack
-      weight={0}
       dimension={[Infinity, 40]}
       margin={[0, 24, 0, 24]}
       onClick={onClick}
     >
       <Path
-        weight={0}
         dimension={[24, 24]}
         margin={[-1, -1, -1, -1]}
         color={color}
         paths={[icon]}
       />
       <Text
+        weight={1}
         margin={[-1, 0, -1, 16]}
         fontFamily="Helvetica"
         fontWeight={600}

@@ -4,8 +4,9 @@ import { VStack } from "../VStack.js";
 
 export function Logo() {
   return (
-    <VStack weight={0} dimension={[Infinity, 90]}>
+    <VStack dimension={[Infinity, 90]}>
       <Path
+        weight={1}
         dimension={[131, 40]}
         color={[255, 255, 255, 1]}
         margin={[-1, -1, -1, 24]}

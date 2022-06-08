@@ -3,8 +3,10 @@ import { Scroll } from "./Scroll.js";
 export class HScroll extends Scroll {
     handle(e) {
         super.handle(e);
-        if (e instanceof WheelEvent) {
-            this.scroll(e.deltaX * 0.1);
+        if (e.handled)
+            return;
+        if (e instanceof WheelEvent && Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+            this.scroll(-e.deltaX);
             e.handled = true;
         }
     }
@@ -26,7 +28,7 @@ export class HScroll extends Scroll {
             x += child.outerFrame.width;
             contentWidth += child.outerFrame.width;
         }
-        this.minOffset = this.frame.width - contentWidth;
+        this.minOffset = Math.min(this.frame.width - contentWidth, 0);
         this.layoutChildren();
     }
 }

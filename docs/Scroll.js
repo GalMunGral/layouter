@@ -55,6 +55,5 @@ export class Scroll extends Container {
     }
     handle(e) {
         super.handle(e);
-        e.handled = true;
     }
 }

@@ -43,8 +43,8 @@ export class View<C = any> {
   private _props: ViewProps = {
     visible: true,
     dimension: [0, 0],
-    margin: [0, 0, 0, 0],
-    weight: 1,
+    margin: [-1, -1, -1, -1],
+    weight: 0,
     backgroundColor: [0, 0, 0, 0],
     borderColor: [0, 0, 0, 0],
     shadowColor: [0, 0, 0, 0],
@@ -53,7 +53,7 @@ export class View<C = any> {
     shadowOffset: [0, 0],
     shadowBlur: 0,
     padding: [0, 0, 0, 0],
-    fontFamily: "monospace",
+    fontFamily: "Helvetica",
     textAlign: "center",
     color: [0, 0, 0, 1],
     fontSize: 16,
@@ -163,8 +163,6 @@ export class View<C = any> {
     ctx.shadowOffsetX = shadowOffset[0];
     ctx.shadowOffsetY = shadowOffset[1];
     ctx.fillStyle = "rgba(" + backgroundColor.join(",") + ")";
-
-    ctx.shadowBlur = 0;
     ctx.strokeStyle = "rgba(" + borderColor.join(",") + ")";
     ctx.lineWidth = bw;
     ctx.beginPath();

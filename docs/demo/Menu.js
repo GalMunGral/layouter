@@ -37,7 +37,7 @@ export function Menu() {
         createElement(LibraryButton, null)));
 }
 function MenuButton({ icon, title, color, onClick }) {
-    return (createElement(HStack, { weight: 0, dimension: [Infinity, 40], margin: [0, 24, 0, 24], onClick: onClick },
-        createElement(Path, { weight: 0, dimension: [24, 24], margin: [-1, -1, -1, -1], color: color, paths: [icon] }),
-        createElement(Text, { margin: [-1, 0, -1, 16], fontFamily: "Helvetica", fontWeight: 600, textAlign: "start", fontSize: 14, color: color, dimension: [0, 14] }, title)));
+    return (createElement(HStack, { dimension: [Infinity, 40], margin: [0, 24, 0, 24], onClick: onClick },
+        createElement(Path, { dimension: [24, 24], margin: [-1, -1, -1, -1], color: color, paths: [icon] }),
+        createElement(Text, { weight: 1, margin: [-1, 0, -1, 16], fontFamily: "Helvetica", fontWeight: 600, textAlign: "start", fontSize: 14, color: color, dimension: [0, 14] }, title)));
 }
