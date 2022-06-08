@@ -21,7 +21,7 @@ export class View {
             borderRadius: [0, 0, 0, 0],
             shadowOffset: [0, 0],
             shadowBlur: 0,
-            padding: [4, 4, 4, 4],
+            padding: [0, 0, 0, 0],
             fontFamily: "monospace",
             textAlign: "center",
             color: [0, 0, 0, 1],
@@ -38,7 +38,7 @@ export class View {
                     this.props[key] = v;
                 });
             }
-            else if (config[key]) {
+            else {
                 this._props[key] = init;
             }
         }

@@ -1,6 +1,5 @@
 import { Display } from "./Display.js";
 import { Event } from "./Event.js";
-import { Font, Fonts, Glyph } from "./Font.js";
 import { Rect } from "./Geometry.js";
 import { View, ViewConfig } from "./View.js";
 

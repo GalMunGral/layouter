@@ -31,11 +31,14 @@ export class HStack extends Stack {
     let rem = total;
     for (let child of this.visibleChildren) {
       const props = child.deviceProps;
-      let extra = Math.round((total * props.weight!) / totalWeight);
-      rem -= extra;
-      child.outerFrame.width = props.dimension![0] + extra;
+      child.outerFrame.width = props.dimension![0];
+      if (totalWeight) {
+        let extra = Math.round((total * props.weight!) / totalWeight);
+        rem -= extra;
+        child.outerFrame.width += extra;
+      }
     }
-    if (rem) {
+    if (rem < 0) {
       this.visibleChildren[this.visibleChildren.length - 1].outerFrame.width +=
         rem;
     }

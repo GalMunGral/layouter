@@ -36,9 +36,12 @@ export class Display {
             const pos = new Point(e.clientX * window.devicePixelRatio, e.clientY * window.devicePixelRatio);
             const evt = new MouseUpEvent(pos);
             this.root.handle(evt);
-            if (Event.previous instanceof MouseDownEvent) {
-                this.root.handle(new MouseClickEvent(pos));
-            }
+            Event.previous = evt;
+        };
+        window.onclick = (e) => {
+            const pos = new Point(e.clientX * window.devicePixelRatio, e.clientY * window.devicePixelRatio);
+            const evt = new MouseClickEvent(pos);
+            this.root.handle(evt);
             Event.previous = evt;
         };
         window.onmousemove = throttle((e) => {
