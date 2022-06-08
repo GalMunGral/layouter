@@ -2,20 +2,25 @@ import { Image } from "../Image.js";
 import { Text } from "../Text.js";
 import { createElement } from "../util.js";
 import { VStack } from "../VStack.js";
+import { appState } from "./App.js";
 
-export function Card({ url }: { url: string }) {
+export function Card({ id, url }: { id: string; url: string }) {
+  const selected = appState.$(["selected"], (v) => v == id);
   return (
     <VStack
-      dimension={[160, 240]}
+      dimension={[206, 284]}
       margin={[20, 20, 20, 20]}
-      backgroundColor={[24, 24, 24, 1]}
+      backgroundColor={selected.$((v) =>
+        v ? [50, 50, 50, 1] : [24, 24, 24, 1]
+      )}
       borderRadius={[8, 8, 8, 8]}
-      shadowColor={[0, 0, 0, 1]}
+      shadowColor={selected.$((v) => (v ? [0, 0, 0, 0.5] : [0, 0, 0, 1]))}
       shadowOffset={[2, 2]}
       shadowBlur={10}
+      onClick={() => appState.set("selected", id)}
     >
       <Image
-        dimension={[150, 150]}
+        dimension={[190, 190]}
         margin={[16, 16, 16, 16]}
         borderRadius={[4, 4, 4, 4]}
         objectFit="cover"
