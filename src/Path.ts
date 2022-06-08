@@ -425,6 +425,9 @@ function parseSvgPath(d: string): Array<Command> {
     );
   }
 
+  /**
+   * https://www.w3.org/TR/SVG/implnote.html#ArcImplementationNotes
+   */
   function makeArc(
     x1: number,
     y1: number,

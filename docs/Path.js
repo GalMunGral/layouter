@@ -322,6 +322,9 @@ function parseSvgPath(d) {
         return (acos((ux * vx + uy * vy) /
             (sqrt(ux ** 2 + uy ** 2) * sqrt(vx ** 2 + vy ** 2))) * sign);
     }
+    /**
+     * https://www.w3.org/TR/SVG/implnote.html#ArcImplementationNotes
+     */
     function makeArc(x1, y1, x2, y2, rx, ry, theta, largeArc, sweep) {
         let x1$ = (cos(theta) * (x1 - x2)) / 2 + (sin(theta) * (y1 - y2)) / 2;
         let y1$ = (-sin(theta) * (x1 - x2)) / 2 + (cos(theta) * (y1 - y2)) / 2;
