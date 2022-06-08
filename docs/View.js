@@ -25,7 +25,8 @@ export class View {
             fontFamily: "monospace",
             textAlign: "center",
             color: [0, 0, 0, 1],
-            size: 16,
+            fontSize: 16,
+            fontWeight: 400,
         };
         if (config.children) {
             this.children = config.children;
@@ -45,7 +46,7 @@ export class View {
     }
     get deviceProps() {
         const props = clone(this.props);
-        for (let key of ["borderWidth", "shadowBlur", "size"]) {
+        for (let key of ["borderWidth", "shadowBlur", "fontSize"]) {
             props[key] *= window.devicePixelRatio;
         }
         for (let key of [

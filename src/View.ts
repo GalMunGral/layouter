@@ -22,7 +22,8 @@ export type ViewProps = {
   padding: vec4;
   fontFamily: string;
   textAlign: "start" | "center";
-  size: number;
+  fontSize: number;
+  fontWeight: number;
   color: vec4;
   onClick?: (e: MouseClickEvent) => void;
 };
@@ -55,7 +56,8 @@ export class View<C = any> {
     fontFamily: "monospace",
     textAlign: "center",
     color: [0, 0, 0, 1],
-    size: 16,
+    fontSize: 16,
+    fontWeight: 400,
   };
 
   constructor(config: ViewConfig<C>) {
@@ -77,7 +79,7 @@ export class View<C = any> {
 
   get deviceProps(): ViewProps {
     const props = clone(this.props);
-    for (let key of ["borderWidth", "shadowBlur", "size"]) {
+    for (let key of ["borderWidth", "shadowBlur", "fontSize"]) {
       props[key] *= window.devicePixelRatio;
     }
     for (let key of [

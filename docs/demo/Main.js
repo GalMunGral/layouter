@@ -1,5 +1,9 @@
+import { HStack } from "../HStack.js";
 import { createElement } from "../util.js";
 import { VStack } from "../VStack.js";
+import { Menu } from "./Menu.js";
 export function Main() {
-    return createElement(VStack, { backgroundColor: [255, 0, 0, 1] });
+    return (createElement(HStack, null,
+        createElement(Menu, null),
+        createElement(VStack, { backgroundColor: [83, 83, 83, 1] })));
 }

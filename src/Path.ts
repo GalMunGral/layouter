@@ -4,7 +4,7 @@ import { View, ViewConfig } from "./View.js";
 
 const { cos, sin, acos, PI, sqrt } = Math;
 
-export type SvgPath = {
+export type SvgPathCommands = {
   width: number;
   height: number;
   commands: Array<Command>;
@@ -57,16 +57,18 @@ export type Command =
       type: "CLOSE_PATH";
     };
 
-type PathConfig = {
-  paths: Array<{
-    width: number;
-    height: number;
-    d: string;
-  }>;
+export type SvgPath = {
+  width: number;
+  height: number;
+  d: string;
+};
+
+export type PathConfig = {
+  paths: Array<SvgPath>;
 };
 
 export class Path extends View {
-  private paths: Array<SvgPath>;
+  private paths: Array<SvgPathCommands>;
   constructor(config: ViewConfig & PathConfig) {
     super(config);
     this.paths = config.paths.map(({ width, height, d }) => ({

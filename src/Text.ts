@@ -11,7 +11,7 @@ export class Text extends View<string> {
 
   public get font(): string {
     const props = this.deviceProps;
-    return `${props.size}px ${props.fontFamily}`;
+    return `${props.fontWeight} ${props.fontSize}px ${props.fontFamily}`;
   }
 
   constructor(config: ViewConfig<string>) {
@@ -31,7 +31,8 @@ export class Text extends View<string> {
       if (this.getTextWidth(line + c) > this.contentWidth) {
         this.lines.push(line);
         line = c;
-        if (props.size * (this.lines.length + 1) > this.contentHeight) return;
+        if (props.fontSize * (this.lines.length + 1) > this.contentHeight)
+          return;
       } else {
         line += c;
       }
@@ -63,7 +64,7 @@ export class Text extends View<string> {
         ctx.fillText(
           line,
           this.frame.x + this.frame.width / 2,
-          this.frame.y + props.padding[0] + props.size * i
+          this.frame.y + props.padding[0] + props.fontSize * i
         );
       }
     } else {
@@ -72,7 +73,7 @@ export class Text extends View<string> {
         ctx.fillText(
           line,
           this.frame.x + props.padding[3],
-          this.frame.y + props.padding[0] + props.size * i
+          this.frame.y + props.padding[0] + props.fontSize * i
         );
       }
     }

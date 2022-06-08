@@ -22,7 +22,7 @@ export function Player() {
             color={[106, 106, 106, 1]}
             margin={[-1, -1, -1, -1]}
             dimension={[20, 10]}
-            size={10}
+            fontSize={10}
             fontFamily="Helvetica"
           >
             3:08
@@ -37,7 +37,7 @@ export function Player() {
             color={[106, 106, 106, 1]}
             margin={[-1, -1, -1, -1]}
             dimension={[20, 10]}
-            size={10}
+            fontSize={10}
             fontFamily="Helvetica"
           >
             3:08
