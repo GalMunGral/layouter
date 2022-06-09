@@ -99,15 +99,15 @@ export class Display {
       this.root.handle(evt);
       Event.previous = evt;
     };
-    window.onmousemove = throttle((e) => {
-      const pos = new Point(
-        e.clientX * window.devicePixelRatio,
-        e.clientY * window.devicePixelRatio
-      );
-      const evt = new MouseMoveEvent(pos);
-      this.root.handle(evt);
-      Event.previous = evt;
-    });
+    // window.onmousemove = throttle((e) => {
+    //   const pos = new Point(
+    //     e.clientX * window.devicePixelRatio,
+    //     e.clientY * window.devicePixelRatio
+    //   );
+    //   const evt = new MouseMoveEvent(pos);
+    //   this.root.handle(evt);
+    //   Event.previous = evt;
+    // });
     window.onwheel = throttle((e) => {
       const pos = new Point(
         e.clientX * window.devicePixelRatio,

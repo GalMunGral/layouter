@@ -1,4 +1,4 @@
-import { Event, MouseClickEvent, MouseDownEvent, MouseMoveEvent, MouseUpEvent, WheelEvent, } from "./Event.js";
+import { Event, MouseClickEvent, MouseDownEvent, MouseUpEvent, WheelEvent, } from "./Event.js";
 import { Point, Rect } from "./Geometry.js";
 export class Display {
     constructor(root) {
@@ -57,12 +57,15 @@ export class Display {
             this.root.handle(evt);
             Event.previous = evt;
         };
-        window.onmousemove = throttle((e) => {
-            const pos = new Point(e.clientX * window.devicePixelRatio, e.clientY * window.devicePixelRatio);
-            const evt = new MouseMoveEvent(pos);
-            this.root.handle(evt);
-            Event.previous = evt;
-        });
+        // window.onmousemove = throttle((e) => {
+        //   const pos = new Point(
+        //     e.clientX * window.devicePixelRatio,
+        //     e.clientY * window.devicePixelRatio
+        //   );
+        //   const evt = new MouseMoveEvent(pos);
+        //   this.root.handle(evt);
+        //   Event.previous = evt;
+        // });
         window.onwheel = throttle((e) => {
             const pos = new Point(e.clientX * window.devicePixelRatio, e.clientY * window.devicePixelRatio);
             const evt = new WheelEvent(pos, e.deltaX * window.devicePixelRatio, e.deltaY * window.devicePixelRatio);

@@ -1,4 +1,5 @@
 import { Rect } from "./Geometry.js";
+import { Observable } from "./Observable.js";
 import { View } from "./View.js";
 export class Image extends View {
     constructor(config) {
@@ -6,13 +7,26 @@ export class Image extends View {
         this.el = null;
         this.imageFrame = new Rect(0, 0, 0, 0);
         this.objectFit = config.objectFit;
-        const el = document.createElement("img");
-        el.src = config.url;
-        el.onload = () => {
-            this.el = el;
-            this.layout();
-            this.redraw();
-        };
+        if (config.url instanceof Observable) {
+            config.url.subscribe((v) => {
+                const el = document.createElement("img");
+                el.src = v;
+                el.onload = () => {
+                    this.el = el;
+                    this.layout();
+                    this.redraw();
+                };
+            });
+        }
+        else {
+            const el = document.createElement("img");
+            el.src = config.url;
+            el.onload = () => {
+                this.el = el;
+                this.layout();
+                this.redraw();
+            };
+        }
     }
     layout() {
         if (!this.el)

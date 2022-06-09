@@ -10,4 +10,7 @@ export function App() {
 }
 export const appState = new State({
     selected: "",
+    url: "",
+    title: "",
+    description: "",
 });

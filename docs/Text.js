@@ -1,10 +1,24 @@
 import { Display } from "./Display.js";
+import { Observable } from "./Observable.js";
 import { View } from "./View.js";
 export class Text extends View {
     constructor(config) {
         super(config);
         this.lines = [];
-        this.content = this.children.join("");
+        this.content = "";
+        if (this.children[0] instanceof Observable) {
+            // TODO combine observables
+            this.children[0].subscribe((v) => {
+                queueMicrotask(() => {
+                    this.layout();
+                    this.redraw();
+                });
+                this.content = v;
+            });
+        }
+        else {
+            this.content = this.children.join("");
+        }
     }
     get font() {
         const props = this.deviceProps;

@@ -1,9 +1,10 @@
 import { Display } from "./Display.js";
 import { Rect } from "./Geometry.js";
+import { Observable } from "./Observable.js";
 import { View, ViewConfig } from "./View.js";
 
 type ImageConfig = {
-  url: string;
+  url: string | Observable<string>;
   objectFit: "contain" | "cover";
 };
 
@@ -14,13 +15,25 @@ export class Image extends View {
   constructor(config: ViewConfig & ImageConfig) {
     super(config);
     this.objectFit = config.objectFit;
-    const el = document.createElement("img");
-    el.src = config.url;
-    el.onload = () => {
-      this.el = el;
-      this.layout();
-      this.redraw();
-    };
+    if (config.url instanceof Observable) {
+      config.url.subscribe((v) => {
+        const el = document.createElement("img");
+        el.src = v;
+        el.onload = () => {
+          this.el = el;
+          this.layout();
+          this.redraw();
+        };
+      });
+    } else {
+      const el = document.createElement("img");
+      el.src = config.url;
+      el.onload = () => {
+        this.el = el;
+        this.layout();
+        this.redraw();
+      };
+    }
   }
 
   public override layout(): void {

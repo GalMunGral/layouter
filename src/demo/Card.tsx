@@ -4,20 +4,33 @@ import { createElement } from "../util.js";
 import { VStack } from "../VStack.js";
 import { appState } from "./App.js";
 
-export function Card({ id, url }: { id: string; url: string }) {
+type CardConfig = {
+  id: string;
+  url: string;
+  title: string;
+  description: string;
+};
+
+export function Card({ id, url, title, description }: CardConfig) {
   const selected = appState.$(["selected"], (v) => v == id);
+  const selectAlbum = () => {
+    appState.set("selected", id);
+    appState.set("url", url);
+    appState.set("title", title);
+    appState.set("description", description);
+  };
   return (
     <VStack
       dimension={[206, 284]}
       margin={[20, 20, 20, 20]}
       backgroundColor={selected.$((v) =>
-        v ? [50, 50, 50, 1] : [24, 24, 24, 1]
+        v ? [29, 185, 84, 1] : [24, 24, 24, 1]
       )}
       borderRadius={[8, 8, 8, 8]}
       shadowColor={selected.$((v) => (v ? [0, 0, 0, 0.5] : [0, 0, 0, 1]))}
       shadowOffset={[2, 2]}
       shadowBlur={10}
-      onClick={() => appState.set("selected", id)}
+      onClick={selectAlbum}
     >
       <Image
         dimension={[190, 190]}
@@ -35,18 +48,18 @@ export function Card({ id, url }: { id: string; url: string }) {
         textAlign="start"
         fontWeight={800}
       >
-        Daily Mix 2
+        {title}
       </Text>
       <Text
         dimension={[Infinity, 28]}
-        color={[179, 179, 179, 1]}
+        color={selected.$((v) => (v ? [255, 255, 255, 1] : [179, 179, 179, 1]))}
         margin={[0, 16, -1, 16]}
         fontFamily="Helvetica"
         fontSize={14}
         textAlign="start"
         fontWeight={500}
       >
-        Some description here, etc, etc...
+        {description}
       </Text>
     </VStack>
   );

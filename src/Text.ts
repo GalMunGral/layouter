@@ -1,22 +1,34 @@
 import { Display } from "./Display.js";
 import { Event } from "./Event.js";
 import { Point, Rect } from "./Geometry.js";
+import { Observable } from "./Observable.js";
 import { View, ViewConfig } from "./View.js";
 
 export interface StyleConfig {}
 
-export class Text extends View<string> {
+export class Text extends View<string | Observable<string>> {
   private lines: Array<string> = [];
-  public content: string;
+  public content: string = "";
 
   public get font(): string {
     const props = this.deviceProps;
     return `${props.fontWeight} ${props.fontSize}px ${props.fontFamily}`;
   }
 
-  constructor(config: ViewConfig<string>) {
+  constructor(config: ViewConfig<string | Observable<string>>) {
     super(config);
-    this.content = this.children.join("");
+    if (this.children[0] instanceof Observable) {
+      // TODO combine observables
+      this.children[0].subscribe((v) => {
+        queueMicrotask(() => {
+          this.layout();
+          this.redraw();
+        });
+        this.content = v;
+      });
+    } else {
+      this.content = this.children.join("");
+    }
   }
 
   public handle(e: Event): void {
