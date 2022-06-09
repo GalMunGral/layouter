@@ -1,6 +1,7 @@
 import { Container } from "./Container.js";
 import { Display } from "./Display.js";
-import { Event, MouseEnterEvent, MouseExitEvent, } from "./Event.js";
+import { Event, MouseEnterEvent, MouseExitEvent } from "./Event.js";
+import { Rect } from "./Geometry.js";
 import { Observable } from "./Observable.js";
 export class Scroll extends Container {
     constructor(config) {
@@ -9,8 +10,16 @@ export class Scroll extends Container {
         this.offsetY = 0;
         this.minOffsetX = 0;
         this.minOffsetY = 0;
+        this.contentFrame = new Rect(0, 0, 0, 0);
         this.childMap = {};
         this.isLayoutRoot = true;
+        this.canvas = document.createElement("canvas");
+        this.canvas.width = 5000;
+        this.canvas.height = 5000;
+        this.hiddenCtx = this.canvas.getContext("2d");
+        for (let child of this.children) {
+            child.ctx = this.hiddenCtx;
+        }
         if (config.data instanceof Observable) {
             config.data.subscribe((v) => {
                 this.reload(v, config.renderItem);
@@ -48,14 +57,13 @@ export class Scroll extends Container {
         this.childMap = childMap;
         queueMicrotask(() => {
             this.layout();
-            this.updateVisibility(this.visible);
-            this.redraw();
+            this.drawContent(); // OPTIMIZE THIS
         });
     }
     handle(e) {
         var _a, _b;
         e.translate(-this.translateX, -this.translateY);
-        for (let child of this.visibleChildren) {
+        for (let child of this.displayChildren) {
             if (child.frame.includes(e.point)) {
                 if (!child.frame.includes((_a = Event.previous) === null || _a === void 0 ? void 0 : _a.point)) {
                     child.handle(new MouseEnterEvent(e.point));
@@ -72,32 +80,43 @@ export class Scroll extends Container {
         super.handle(e);
     }
     scroll(deltaX, deltaY) {
+        console.log("scroll");
         this.offsetX = Math.max(Math.min(this.offsetX + deltaX, 0), this.minOffsetX);
         this.offsetY = Math.max(Math.min(this.offsetY + deltaY, 0), this.minOffsetY);
-        this.updateVisibility(this.visible);
-        this.redraw();
+        let visible = this.outerFrame;
+        for (let cur = this.parent; cur; cur = cur.parent) {
+            visible = visible.translate(cur.translateX, cur.translateY);
+        }
+        Display.instance.compose(visible);
     }
-    updateVisibility(visible) {
-        this.visible = this.outerFrame.intersect(visible);
-        let visibleInside = this.frame.intersect(visible);
-        if (!visibleInside)
-            return;
-        visibleInside = visibleInside.translate(-this.translateX, -this.translateY);
-        for (let child of this.children) {
-            child.updateVisibility(visibleInside);
+    compose(dirty, translate) {
+        translate = translate.translate(this.translateX, this.translateY);
+        Display.instance.copy(this.canvas, dirty, translate);
+        for (let child of this.displayChildren) {
+            if (!(child instanceof Container))
+                continue;
+            const d = child.frame
+                .translate(translate.x, translate.y)
+                .intersect(dirty);
+            if (d) {
+                child.compose(d, translate);
+            }
         }
     }
-    draw(dirty) {
-        const ctx = Display.instance.ctx;
+    drawContent() {
+        const { x, y, width, height } = this.contentFrame;
+        this.hiddenCtx.clearRect(x, y, width, height);
+        for (let child of this.displayChildren) {
+            child.draw(this.hiddenCtx, this.contentFrame, true);
+        }
+    }
+    draw(ctx, dirty, recursive) {
         ctx.save();
-        super.draw(dirty);
-        ctx.translate(this.translateX, this.translateY);
-        const dirty$ = dirty.translate(-this.translateX, -this.translateY);
-        for (let child of this.visibleChildren) {
-            const d = dirty$.intersect(child.visible);
-            if (d)
-                child.draw(d);
-        }
+        super.draw(ctx, dirty);
         ctx.restore();
+        if (recursive) {
+            // INITIAL RENDER
+            this.drawContent();
+        }
     }
 }

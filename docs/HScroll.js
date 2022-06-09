@@ -13,7 +13,8 @@ export class HScroll extends Scroll {
     layout() {
         let x = 0;
         let y = 0;
-        let contentWidth = 0;
+        this.contentFrame.height = this.frame.height;
+        this.contentFrame.width = 0;
         for (let child of this.displayChildren) {
             let [width, height] = child.deviceProps.dimension;
             let [top, right, bottom, left] = child.deviceProps.margin.map((x) => Math.max(0, x));
@@ -26,9 +27,9 @@ export class HScroll extends Scroll {
             child.outerFrame.width = left + width + right;
             child.outerFrame.height = child.frame.height + top + bottom;
             x += child.outerFrame.width;
-            contentWidth += child.outerFrame.width;
+            this.contentFrame.width += child.outerFrame.width;
         }
-        this.minOffsetX = Math.min(this.frame.width - contentWidth, 0);
+        this.minOffsetX = Math.min(this.frame.width - this.contentFrame.width, 0);
         for (let child of this.displayChildren) {
             child.layout();
         }

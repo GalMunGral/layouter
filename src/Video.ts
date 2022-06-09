@@ -1,5 +1,4 @@
-import { Display } from "./Display.js";
-import { Rect } from "./Geometry.js";
+import { Point, Rect } from "./Geometry.js";
 import { View, ViewConfig } from "./View.js";
 
 type ImageConfig = {
@@ -60,10 +59,9 @@ export class Video extends View {
     }
   }
 
-  public draw(dirty: Rect): void {
-    const ctx = Display.instance.ctx;
+  public draw(ctx: CanvasRenderingContext2D, dirty: Rect): void {
     ctx.save();
-    super.draw(dirty);
+    super.draw(ctx, dirty);
     if (this.el) {
       if (this.objectFit == "contain") {
         ctx.drawImage(

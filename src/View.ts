@@ -1,11 +1,15 @@
+import { Container } from "./Container.js";
 import { Display } from "./Display.js";
 import { Event, MouseClickEvent } from "./Event.js";
 import { Rect } from "./Geometry.js";
 import { Observable } from "./Observable.js";
-import { Scroll } from "./Scroll.js";
 
 export type vec4 = [number, number, number, number];
 export type vec2 = [number, number];
+
+// export type LayoutContext = {
+//   ctx: CanvasRenderingContext2D;
+// };
 
 export type ViewProps = {
   visible: boolean;
@@ -33,9 +37,10 @@ export type ViewConfig<C = any> = Partial<{
 }> & { children?: Array<C> };
 
 export abstract class View<C = any> {
+  public ctx?: CanvasRenderingContext2D;
+  public contentFrame: Rect = new Rect(0, 0, 0, 0);
   public frame: Rect = new Rect(0, 0, 0, 0);
   public outerFrame: Rect = new Rect(0, 0, 0, 0);
-  public visible: Rect | null = new Rect(0, 0, 0, 0);
   public isLayoutRoot = false;
   public parent?: View<View>;
   public children: Array<C> = [];
@@ -59,10 +64,6 @@ export abstract class View<C = any> {
     fontSize: 16,
     fontWeight: 400,
   };
-
-  public updateVisibility(visible: Rect | null): void {
-    this.visible = this.outerFrame.intersect(visible);
-  }
 
   get translateX() {
     return 0;
@@ -122,13 +123,12 @@ export abstract class View<C = any> {
               prop == "weight" ||
               prop == "fontFamily"
             ) {
-              let cur: View = view;
-              const root = Display.instance.root;
-              while (cur != root && !cur.isLayoutRoot) cur = cur.parent!;
               queueMicrotask(() => {
-                cur.layout();
-                cur.updateVisibility(cur.visible);
-                cur.redraw();
+                view.layoutRoot.parent!.layout();
+                view.layoutRoot.parent?.children.forEach((child) => {
+                  child.draw(child.ctx!, child.outerFrame, true); // RECURSIVE?
+                });
+                Display.instance.compose(Display.instance.root.outerFrame);
               });
             } else {
               queueMicrotask(() => {
@@ -153,8 +153,27 @@ export abstract class View<C = any> {
 
   public abstract layout(): void;
 
-  public draw(dirty: Rect): void {
-    const ctx = Display.instance.ctx;
+  public redraw() {
+    console.log("redraw");
+    if (!this.layoutRoot.ctx) return;
+    const { x, y, width, height } = this.outerFrame;
+    this.layoutRoot.ctx.clearRect(x, y, width, height);
+    this.layoutRoot.draw(this.layoutRoot.ctx!, this.outerFrame);
+    let visible = this.outerFrame;
+    for (let cur = this.parent; cur; cur = cur.parent) {
+      visible = visible.translate(cur.translateX, cur.translateY);
+    }
+    Display.instance.compose(visible);
+  }
+
+  get layoutRoot(): View {
+    let cur: View = this;
+    while (cur.parent && !cur.parent?.isLayoutRoot) cur = cur.parent!;
+    return cur;
+  }
+
+  draw(ctx: CanvasRenderingContext2D, dirty: Rect, recursive = false) {
+    this.ctx = ctx;
     const {
       backgroundColor,
       borderColor,
@@ -164,29 +183,15 @@ export abstract class View<C = any> {
       borderWidth: bw,
       borderRadius,
     } = this.deviceProps;
+
     const { x, y, width, height } = this.frame;
     const [r0, r1, r2, r3] = borderRadius;
 
-    ctx.beginPath();
-    ctx.rect(dirty.x, dirty.y, dirty.width, dirty.height);
-    ctx.clip();
-
-    // ctx.save();
-    // ctx.strokeStyle = "blue";
-    // ctx.strokeRect(dirty?.x, dirty?.y, dirty?.width, dirty?.height);
-    // ctx.restore();
-
-    // if (this.visible) {
-    //   ctx.save();
-    //   ctx.strokeStyle = "red";
-    //   ctx.strokeRect(
-    //     this.visible?.x,
-    //     this.visible?.y,
-    //     this.visible?.width,
-    //     this.visible?.height
-    //   );
-    //   ctx.restore();
-    // }
+    if (dirty) {
+      ctx.beginPath();
+      ctx.rect(dirty.x, dirty.y, dirty.width, dirty.height);
+      ctx.clip();
+    }
 
     ctx.shadowColor = "rgba(" + shadowColor.join(",") + ")";
     ctx.shadowBlur = shadowBlur;
@@ -243,17 +248,6 @@ export abstract class View<C = any> {
     if (e instanceof MouseClickEvent) {
       this.props.onClick?.(e);
     }
-  }
-
-  public redraw(): void {
-    if (!this.visible) return;
-    let visible = this.visible;
-    for (let cur: View | undefined = this.parent; cur; cur = cur.parent) {
-      if (!cur.visible || !cur.props.visible) return;
-      visible = visible?.translate(cur.translateX, cur.translateY);
-    }
-    Display.instance.root.draw(visible);
-    Display.instance.ctx.resetTransform();
   }
 
   public destruct(): void {}

@@ -1,12 +1,6 @@
 import { Container } from "./Container.js";
 import { Display } from "./Display.js";
-import {
-  Event,
-  MouseDownEvent,
-  MouseEnterEvent,
-  MouseExitEvent,
-  MouseUpEvent,
-} from "./Event.js";
+import { Event, MouseEnterEvent, MouseExitEvent } from "./Event.js";
 import { Point, Rect } from "./Geometry.js";
 import { Observable } from "./Observable.js";
 import { View, ViewConfig } from "./View.js";
@@ -16,16 +10,28 @@ type ScrollConfig<T extends { id: string }> = {
   renderItem: (t: T) => View;
 };
 
-export abstract class Scroll<T extends { id: string }> extends Container {
+export abstract class Scroll<T extends { id: string } = any> extends Container {
+  public hiddenCtx: CanvasRenderingContext2D;
+  public canvas: HTMLCanvasElement;
   protected offsetX = 0;
   protected offsetY = 0;
   protected minOffsetX = 0;
   protected minOffsetY = 0;
+  public contentFrame: Rect = new Rect(0, 0, 0, 0);
   private childMap: Record<string, View> = {};
   public override isLayoutRoot = true;
 
   constructor(config: ViewConfig & ScrollConfig<T>) {
     super(config);
+    this.canvas = document.createElement("canvas");
+    this.canvas.width = 5000;
+    this.canvas.height = 5000;
+    this.hiddenCtx = this.canvas.getContext("2d")!;
+
+    for (let child of this.children) {
+      child.ctx = this.hiddenCtx;
+    }
+
     if (config.data instanceof Observable) {
       config.data.subscribe((v) => {
         this.reload(v, config.renderItem);
@@ -43,7 +49,6 @@ export abstract class Scroll<T extends { id: string }> extends Container {
   override get translateY() {
     return this.frame.y + this.offsetY;
   }
-
   private reload(data: Array<T>, renderItem: (t: T) => View): void {
     const childMap: Record<string, View> = {};
     this.children = [];
@@ -64,14 +69,13 @@ export abstract class Scroll<T extends { id: string }> extends Container {
     this.childMap = childMap;
     queueMicrotask(() => {
       this.layout();
-      this.updateVisibility(this.visible);
-      this.redraw();
+      this.drawContent(); // OPTIMIZE THIS
     });
   }
 
   override handle(e: Event): void {
     e.translate(-this.translateX, -this.translateY);
-    for (let child of this.visibleChildren) {
+    for (let child of this.displayChildren) {
       if (child.frame.includes(e.point)) {
         if (!child.frame.includes(Event.previous?.point)) {
           child.handle(new MouseEnterEvent(e.point));
@@ -88,6 +92,7 @@ export abstract class Scroll<T extends { id: string }> extends Container {
   }
 
   protected scroll(deltaX: number, deltaY: number) {
+    console.log("scroll");
     this.offsetX = Math.max(
       Math.min(this.offsetX + deltaX, 0),
       this.minOffsetX
@@ -96,30 +101,46 @@ export abstract class Scroll<T extends { id: string }> extends Container {
       Math.min(this.offsetY + deltaY, 0),
       this.minOffsetY
     );
-    this.updateVisibility(this.visible);
-    this.redraw();
+    let visible = this.outerFrame;
+    for (let cur = this.parent; cur; cur = cur.parent) {
+      visible = visible.translate(cur.translateX, cur.translateY);
+    }
+    Display.instance.compose(visible);
   }
 
-  override updateVisibility(visible: Rect | null): void {
-    this.visible = this.outerFrame.intersect(visible);
-    let visibleInside = this.frame.intersect(visible);
-    if (!visibleInside) return;
-    visibleInside = visibleInside.translate(-this.translateX, -this.translateY);
-    for (let child of this.children) {
-      child.updateVisibility(visibleInside);
+  override compose(dirty: Rect, translate: Point) {
+    translate = translate.translate(this.translateX, this.translateY);
+    Display.instance.copy(this.canvas, dirty, translate);
+    for (let child of this.displayChildren) {
+      if (!(child instanceof Container)) continue;
+      const d = child.frame
+        .translate(translate.x, translate.y)
+        .intersect(dirty);
+      if (d) {
+        child.compose(d, translate);
+      }
     }
   }
 
-  override draw(dirty: Rect) {
-    const ctx = Display.instance.ctx;
+  drawContent() {
+    const { x, y, width, height } = this.contentFrame;
+    this.hiddenCtx.clearRect(x, y, width, height);
+    for (let child of this.displayChildren) {
+      child.draw(this.hiddenCtx, this.contentFrame, true);
+    }
+  }
+
+  override draw(
+    ctx: CanvasRenderingContext2D,
+    dirty: Rect,
+    recursive?: boolean
+  ) {
     ctx.save();
-    super.draw(dirty);
-    ctx.translate(this.translateX, this.translateY);
-    const dirty$ = dirty.translate(-this.translateX, -this.translateY);
-    for (let child of this.visibleChildren) {
-      const d = dirty$.intersect(child.visible);
-      if (d) child.draw(d);
-    }
+    super.draw(ctx, dirty);
     ctx.restore();
+    if (recursive) {
+      // INITIAL RENDER
+      this.drawContent();
+    }
   }
 }

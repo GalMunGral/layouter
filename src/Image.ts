@@ -48,10 +48,9 @@ export class Image extends View {
     }
   }
 
-  public draw(dirty: Rect): void {
-    const ctx = Display.instance.ctx;
+  public override draw(ctx: CanvasRenderingContext2D, dirty: Rect): void {
     ctx.save();
-    super.draw(dirty);
+    super.draw(ctx, dirty);
     if (this.el) {
       if (this.objectFit == "contain") {
         ctx.drawImage(

@@ -1,4 +1,3 @@
-import { Display } from "./Display.js";
 import { Rect } from "./Geometry.js";
 import { View, ViewConfig } from "./View.js";
 
@@ -80,10 +79,9 @@ export class Path extends View {
 
   public layout(): void {}
 
-  override draw(dirty: Rect) {
-    const ctx = Display.instance.ctx;
+  override draw(ctx: CanvasRenderingContext2D, dirty: Rect) {
     ctx.save();
-    super.draw(dirty);
+    super.draw(ctx, dirty);
     ctx.fillStyle = "rgba(" + this.props.color.join(",") + ")";
     ctx.strokeStyle = "rgba(" + this.props.color.join(",") + ")";
 

@@ -1,4 +1,3 @@
-import { Display } from "./Display.js";
 import { View } from "./View.js";
 const { cos, sin, acos, PI, sqrt } = Math;
 export class Path extends View {
@@ -11,10 +10,9 @@ export class Path extends View {
         }));
     }
     layout() { }
-    draw(dirty) {
-        const ctx = Display.instance.ctx;
+    draw(ctx, dirty) {
         ctx.save();
-        super.draw(dirty);
+        super.draw(ctx, dirty);
         ctx.fillStyle = "rgba(" + this.props.color.join(",") + ")";
         ctx.strokeStyle = "rgba(" + this.props.color.join(",") + ")";
         for (let path of this.paths) {

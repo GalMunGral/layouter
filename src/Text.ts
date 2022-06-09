@@ -1,6 +1,6 @@
 import { Display } from "./Display.js";
 import { Event } from "./Event.js";
-import { Rect } from "./Geometry.js";
+import { Point, Rect } from "./Geometry.js";
 import { View, ViewConfig } from "./View.js";
 
 export interface StyleConfig {}
@@ -41,7 +41,7 @@ export class Text extends View<string> {
   }
 
   private getTextWidth(s: string): number {
-    const ctx = Display.instance.ctx;
+    const ctx = Display.instance.displayCtx;
     ctx.font = this.font;
     const metrics = ctx.measureText(s);
     return (
@@ -50,10 +50,9 @@ export class Text extends View<string> {
     );
   }
 
-  override draw(dirty: Rect) {
-    const ctx = Display.instance.ctx;
+  override draw(ctx: CanvasRenderingContext2D, dirty: Rect) {
     ctx.save();
-    super.draw(dirty);
+    super.draw(ctx, dirty);
     const props = this.deviceProps;
     ctx.font = this.font;
     ctx.fillStyle = "rgba(" + props.color.join(",") + ")";

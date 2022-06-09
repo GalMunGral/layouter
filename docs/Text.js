@@ -31,16 +31,15 @@ export class Text extends View {
         this.lines.push(line);
     }
     getTextWidth(s) {
-        const ctx = Display.instance.ctx;
+        const ctx = Display.instance.displayCtx;
         ctx.font = this.font;
         const metrics = ctx.measureText(s);
         return (Math.abs(metrics.actualBoundingBoxLeft) +
             Math.abs(metrics.actualBoundingBoxRight));
     }
-    draw(dirty) {
-        const ctx = Display.instance.ctx;
+    draw(ctx, dirty) {
         ctx.save();
-        super.draw(dirty);
+        super.draw(ctx, dirty);
         const props = this.deviceProps;
         ctx.font = this.font;
         ctx.fillStyle = "rgba(" + props.color.join(",") + ")";

@@ -4,9 +4,9 @@ import { Rect } from "./Geometry.js";
 import { Observable } from "./Observable.js";
 export class View {
     constructor(config) {
+        this.contentFrame = new Rect(0, 0, 0, 0);
         this.frame = new Rect(0, 0, 0, 0);
         this.outerFrame = new Rect(0, 0, 0, 0);
-        this.visible = new Rect(0, 0, 0, 0);
         this.isLayoutRoot = false;
         this.children = [];
         this._props = {
@@ -43,9 +43,6 @@ export class View {
                 this._props[key] = init;
             }
         }
-    }
-    updateVisibility(visible) {
-        this.visible = this.outerFrame.intersect(visible);
     }
     get translateX() {
         return 0;
@@ -85,14 +82,13 @@ export class View {
                             prop == "margin" ||
                             prop == "weight" ||
                             prop == "fontFamily") {
-                            let cur = view;
-                            const root = Display.instance.root;
-                            while (cur != root && !cur.isLayoutRoot)
-                                cur = cur.parent;
                             queueMicrotask(() => {
-                                cur.layout();
-                                cur.updateVisibility(cur.visible);
-                                cur.redraw();
+                                var _a;
+                                view.layoutRoot.parent.layout();
+                                (_a = view.layoutRoot.parent) === null || _a === void 0 ? void 0 : _a.children.forEach((child) => {
+                                    child.draw(child.ctx, child.outerFrame, true); // RECURSIVE?
+                                });
+                                Display.instance.compose(Display.instance.root.outerFrame);
                             });
                         }
                         else {
@@ -113,29 +109,36 @@ export class View {
         const props = this.deviceProps;
         return this.frame.height - props.padding[0] - props.padding[2];
     }
-    draw(dirty) {
-        const ctx = Display.instance.ctx;
+    redraw() {
+        console.log("redraw");
+        if (!this.layoutRoot.ctx)
+            return;
+        const { x, y, width, height } = this.outerFrame;
+        this.layoutRoot.ctx.clearRect(x, y, width, height);
+        this.layoutRoot.draw(this.layoutRoot.ctx, this.outerFrame);
+        let visible = this.outerFrame;
+        for (let cur = this.parent; cur; cur = cur.parent) {
+            visible = visible.translate(cur.translateX, cur.translateY);
+        }
+        Display.instance.compose(visible);
+    }
+    get layoutRoot() {
+        var _a;
+        let cur = this;
+        while (cur.parent && !((_a = cur.parent) === null || _a === void 0 ? void 0 : _a.isLayoutRoot))
+            cur = cur.parent;
+        return cur;
+    }
+    draw(ctx, dirty, recursive = false) {
+        this.ctx = ctx;
         const { backgroundColor, borderColor, shadowColor, shadowOffset, shadowBlur, borderWidth: bw, borderRadius, } = this.deviceProps;
         const { x, y, width, height } = this.frame;
         const [r0, r1, r2, r3] = borderRadius;
-        ctx.beginPath();
-        ctx.rect(dirty.x, dirty.y, dirty.width, dirty.height);
-        ctx.clip();
-        // ctx.save();
-        // ctx.strokeStyle = "blue";
-        // ctx.strokeRect(dirty?.x, dirty?.y, dirty?.width, dirty?.height);
-        // ctx.restore();
-        // if (this.visible) {
-        //   ctx.save();
-        //   ctx.strokeStyle = "red";
-        //   ctx.strokeRect(
-        //     this.visible?.x,
-        //     this.visible?.y,
-        //     this.visible?.width,
-        //     this.visible?.height
-        //   );
-        //   ctx.restore();
-        // }
+        if (dirty) {
+            ctx.beginPath();
+            ctx.rect(dirty.x, dirty.y, dirty.width, dirty.height);
+            ctx.clip();
+        }
         ctx.shadowColor = "rgba(" + shadowColor.join(",") + ")";
         ctx.shadowBlur = shadowBlur;
         ctx.shadowOffsetX = shadowOffset[0];
@@ -172,18 +175,6 @@ export class View {
         if (e instanceof MouseClickEvent) {
             (_b = (_a = this.props).onClick) === null || _b === void 0 ? void 0 : _b.call(_a, e);
         }
-    }
-    redraw() {
-        if (!this.visible)
-            return;
-        let visible = this.visible;
-        for (let cur = this.parent; cur; cur = cur.parent) {
-            if (!cur.visible || !cur.props.visible)
-                return;
-            visible = visible === null || visible === void 0 ? void 0 : visible.translate(cur.translateX, cur.translateY);
-        }
-        Display.instance.root.draw(visible);
-        Display.instance.ctx.resetTransform();
     }
     destruct() { }
 }

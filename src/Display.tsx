@@ -1,3 +1,4 @@
+import { Container } from "./Container.js";
 import {
   Event,
   MouseClickEvent,
@@ -11,33 +12,59 @@ import { View } from "./View.js";
 
 export class Display {
   public static instance: Display;
-  public canvas = document.createElement("canvas");
-  public ctx = this.canvas.getContext("2d")!;
+  public displayCanvas = document.createElement("canvas");
+  public displayCtx = this.displayCanvas.getContext("2d")!;
+  public canvas: HTMLCanvasElement;
+  public ctx: CanvasRenderingContext2D;
+  public isLayoutRoot = true;
 
-  constructor(public root: View) {
+  constructor(public root: Container) {
     Display.instance = this;
     this.setupEvents();
     document.body.style.margin = "0px";
-    document.body.append(this.canvas);
+    document.body.append(this.displayCanvas);
+
+    this.canvas = document.createElement("canvas");
+    this.canvas.width = 10000;
+    this.canvas.height = 10000;
+    this.ctx = this.canvas.getContext("2d")!;
+
     this.render();
-    console.log(this.root);
   }
 
   render() {
-    this.canvas.width = window.innerWidth * window.devicePixelRatio;
-    this.canvas.height = window.innerHeight * window.devicePixelRatio;
-    this.canvas.style.width = window.innerWidth + "px";
-    this.canvas.style.height = window.innerHeight + "px";
+    this.displayCanvas.width = window.innerWidth * window.devicePixelRatio;
+    this.displayCanvas.height = window.innerHeight * window.devicePixelRatio;
+    this.displayCanvas.style.width = window.innerWidth + "px";
+    this.displayCanvas.style.height = window.innerHeight + "px";
     this.root.outerFrame = this.root.frame = new Rect(
       0,
       0,
-      this.canvas.width,
-      this.canvas.height
+      this.displayCanvas.width,
+      this.displayCanvas.height
     );
-    this.root.visible = this.root.frame;
     this.root.layout();
-    this.root.updateVisibility(this.root.frame);
-    this.root.draw(this.root.frame);
+    this.root.draw(this.ctx, this.root.outerFrame, true);
+    this.compose(this.root.frame);
+  }
+
+  public compose(dirty: Rect) {
+    this.copy(this.canvas, dirty, new Point(0, 0));
+    this.root.compose(dirty, new Point(0, 0));
+  }
+  public copy(canvas: HTMLCanvasElement, dest: Rect, translate: Point) {
+    const src = dest.translate(-translate.x, -translate.y);
+    this.displayCtx.drawImage(
+      canvas,
+      src.x,
+      src.y,
+      src.width,
+      src.height,
+      dest.x,
+      dest.y,
+      dest.width,
+      dest.height
+    );
   }
 
   setupEvents() {

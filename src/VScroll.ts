@@ -15,7 +15,8 @@ export class VScroll<T extends { id: string }> extends Scroll<T> {
   layout(): void {
     let x = 0;
     let y = 0;
-    let contentHeight = 0;
+    this.contentFrame.width = this.frame.width;
+    this.contentFrame.height = 0;
     for (let child of this.displayChildren) {
       let [width, height] = child.deviceProps.dimension;
       let [top, right, bottom, left] = child.deviceProps.margin.map((x) =>
@@ -30,9 +31,9 @@ export class VScroll<T extends { id: string }> extends Scroll<T> {
       child.outerFrame.width = child.frame.width + left + right;
       child.outerFrame.height = height + top + bottom;
       y += child.outerFrame.height;
-      contentHeight += child.outerFrame.height;
+      this.contentFrame.height += child.outerFrame.height;
     }
-    this.minOffsetY = Math.min(this.frame.height - contentHeight, 0);
+    this.minOffsetY = Math.min(this.frame.height - this.contentFrame.height, 0);
     for (let child of this.displayChildren) {
       child.layout();
     }

@@ -1,14 +1,10 @@
 import { Container } from "./Container.js";
-import { Display } from "./Display.js";
 import { Event, MouseEnterEvent, MouseExitEvent } from "./Event.js";
 export class Stack extends Container {
-    updateVisibility(visible) {
-        this.visible = this.outerFrame.intersect(visible);
-        let visibleInside = this.frame.intersect(visible);
-        if (!visibleInside)
-            return;
+    constructor(config) {
+        super(config);
         for (let child of this.children) {
-            child.updateVisibility(visibleInside);
+            child.ctx = this.ctx;
         }
     }
     layoutChildren() {
@@ -16,9 +12,21 @@ export class Stack extends Container {
             child.layout();
         }
     }
+    compose(dirty, translate) {
+        for (let child of this.displayChildren) {
+            if (!(child instanceof Container))
+                continue;
+            const d = child.frame
+                .translate(translate.x, translate.y)
+                .intersect(dirty);
+            if (d) {
+                child.compose(d, translate);
+            }
+        }
+    }
     handle(e) {
         var _a, _b;
-        for (let child of this.visibleChildren) {
+        for (let child of this.displayChildren) {
             if (child.frame.includes(e.point)) {
                 if (!child.frame.includes((_a = Event.previous) === null || _a === void 0 ? void 0 : _a.point)) {
                     child.handle(new MouseEnterEvent(e.point));
@@ -33,14 +41,13 @@ export class Stack extends Container {
         }
         super.handle(e);
     }
-    draw(dirty) {
-        const ctx = Display.instance.ctx;
+    draw(ctx, dirty, recursive) {
         ctx.save();
-        super.draw(dirty);
-        for (let child of this.visibleChildren) {
-            const d = dirty.intersect(child.visible);
-            if (d)
-                child.draw(d);
+        super.draw(ctx, dirty);
+        for (let child of this.displayChildren) {
+            // let d = child.frame.intersect(dirty);
+            // if (d)
+            child.draw(ctx, dirty, recursive);
         }
         ctx.restore();
     }

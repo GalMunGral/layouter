@@ -1,4 +1,3 @@
-import { Display } from "./Display.js";
 import { Rect } from "./Geometry.js";
 import { View } from "./View.js";
 export class Video extends View {
@@ -46,10 +45,9 @@ export class Video extends View {
             this.imageFrame.y = (this.el.videoHeight - this.imageFrame.height) / 2;
         }
     }
-    draw(dirty) {
-        const ctx = Display.instance.ctx;
+    draw(ctx, dirty) {
         ctx.save();
-        super.draw(dirty);
+        super.draw(ctx, dirty);
         if (this.el) {
             if (this.objectFit == "contain") {
                 ctx.drawImage(this.el, this.imageFrame.x, this.imageFrame.y, this.imageFrame.width, this.imageFrame.height);

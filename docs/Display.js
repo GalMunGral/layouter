@@ -3,25 +3,36 @@ import { Point, Rect } from "./Geometry.js";
 export class Display {
     constructor(root) {
         this.root = root;
-        this.canvas = document.createElement("canvas");
-        this.ctx = this.canvas.getContext("2d");
+        this.displayCanvas = document.createElement("canvas");
+        this.displayCtx = this.displayCanvas.getContext("2d");
+        this.isLayoutRoot = true;
         Display.instance = this;
         this.setupEvents();
         document.body.style.margin = "0px";
-        document.body.append(this.canvas);
+        document.body.append(this.displayCanvas);
+        this.canvas = document.createElement("canvas");
+        this.canvas.width = 10000;
+        this.canvas.height = 10000;
+        this.ctx = this.canvas.getContext("2d");
         this.render();
-        console.log(this.root);
     }
     render() {
-        this.canvas.width = window.innerWidth * window.devicePixelRatio;
-        this.canvas.height = window.innerHeight * window.devicePixelRatio;
-        this.canvas.style.width = window.innerWidth + "px";
-        this.canvas.style.height = window.innerHeight + "px";
-        this.root.outerFrame = this.root.frame = new Rect(0, 0, this.canvas.width, this.canvas.height);
-        this.root.visible = this.root.frame;
+        this.displayCanvas.width = window.innerWidth * window.devicePixelRatio;
+        this.displayCanvas.height = window.innerHeight * window.devicePixelRatio;
+        this.displayCanvas.style.width = window.innerWidth + "px";
+        this.displayCanvas.style.height = window.innerHeight + "px";
+        this.root.outerFrame = this.root.frame = new Rect(0, 0, this.displayCanvas.width, this.displayCanvas.height);
         this.root.layout();
-        this.root.updateVisibility(this.root.frame);
-        this.root.draw(this.root.frame);
+        this.root.draw(this.ctx, this.root.outerFrame, true);
+        this.compose(this.root.frame);
+    }
+    compose(dirty) {
+        this.copy(this.canvas, dirty, new Point(0, 0));
+        this.root.compose(dirty, new Point(0, 0));
+    }
+    copy(canvas, dest, translate) {
+        const src = dest.translate(-translate.x, -translate.y);
+        this.displayCtx.drawImage(canvas, src.x, src.y, src.width, src.height, dest.x, dest.y, dest.width, dest.height);
     }
     setupEvents() {
         window.onresize = debounce(() => {
