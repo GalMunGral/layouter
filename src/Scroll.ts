@@ -1,6 +1,7 @@
 import { Container } from "./Container.js";
+import { Display } from "./Display.js";
 import { Event, MouseDownEvent, MouseUpEvent } from "./Event.js";
-import { Point } from "./Geometry.js";
+import { Point, Rect } from "./Geometry.js";
 import { Observable } from "./Observable.js";
 import { View, ViewConfig } from "./View.js";
 
@@ -10,9 +11,10 @@ type ScrollConfig<T extends { id: string }> = {
 };
 
 export abstract class Scroll<T extends { id: string }> extends Container {
-  protected offset = 0;
-  protected minOffset = 0;
-  protected delta = 0;
+  protected offsetX = 0;
+  protected offsetY = 0;
+  protected minOffsetX = 0;
+  protected minOffsetY = 0;
   private childMap: Record<string, View> = {};
   public override isLayoutRoot = true;
 
@@ -26,6 +28,14 @@ export abstract class Scroll<T extends { id: string }> extends Container {
       this.children = config.data.map((v) => config.renderItem(v));
       this.children.forEach((child) => (child.parent = this));
     }
+  }
+
+  override get translateX() {
+    return this.frame.x + this.offsetX;
+  }
+
+  override get translateY() {
+    return this.frame.y + this.offsetY;
   }
 
   private reload(data: Array<T>, renderItem: (t: T) => View): void {
@@ -48,17 +58,44 @@ export abstract class Scroll<T extends { id: string }> extends Container {
     this.childMap = childMap;
     queueMicrotask(() => {
       this.layout();
+      this.updateVisibility(this.visible);
       this.redraw();
     });
   }
 
-  protected scroll(delta: number) {
-    this.delta = delta;
-    this.offset += delta;
-    this.offset = Math.min(this.offset, 0);
-    this.offset = Math.max(this.offset, this.minOffset);
-    // this.layout(); // FIX THIS
+  protected scroll(deltaX: number, deltaY: number) {
+    this.offsetX = Math.max(
+      Math.min(this.offsetX + deltaX, 0),
+      this.minOffsetX
+    );
+    this.offsetY = Math.max(
+      Math.min(this.offsetY + deltaY, 0),
+      this.minOffsetY
+    );
     this.redraw();
+  }
+
+  override updateVisibility(visible: Rect | null): void {
+    this.visible = this.outerFrame.intersect(visible);
+    let visibleInside = this.frame.intersect(visible);
+    if (!visibleInside) return;
+    visibleInside = visibleInside.translate(-this.translateX, -this.translateY);
+    for (let child of this.children) {
+      child.updateVisibility(visibleInside);
+    }
+  }
+
+  override draw(dirty: Rect) {
+    const ctx = Display.instance.ctx;
+    ctx.save();
+    super.draw(dirty);
+    ctx.translate(this.translateX, this.translateY);
+    const dirty$ = dirty.translate(-this.translateX, -this.translateY);
+    for (let child of this.visibleChildren) {
+      const d = dirty$.intersect(child.visible);
+      if (d) child.draw(d);
+    }
+    ctx.restore();
   }
 
   handle(e: Event): void {

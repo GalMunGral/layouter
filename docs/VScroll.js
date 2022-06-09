@@ -6,13 +6,13 @@ export class VScroll extends Scroll {
         if (e.handled)
             return;
         if (e instanceof WheelEvent && Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-            this.scroll(-e.deltaY);
+            this.scroll(0, -e.deltaY);
             e.handled = true;
         }
     }
     layout() {
-        let x = this.frame.x;
-        let y = this.frame.y + this.offset;
+        let x = 0;
+        let y = 0;
         let contentHeight = 0;
         for (let child of this.visibleChildren) {
             let [width, height] = child.deviceProps.dimension;
@@ -28,7 +28,9 @@ export class VScroll extends Scroll {
             y += child.outerFrame.height;
             contentHeight += child.outerFrame.height;
         }
-        this.minOffset = Math.min(this.frame.height - contentHeight, 0);
-        this.layoutChildren();
+        this.minOffsetY = Math.min(this.frame.height - contentHeight, 0);
+        for (let child of this.visibleChildren) {
+            child.layout();
+        }
     }
 }

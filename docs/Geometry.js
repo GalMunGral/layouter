@@ -26,6 +26,9 @@ export class Rect {
         const height = bottom - top;
         return new Rect(left, top, width, height);
     }
+    translate(deltaX, deltaY) {
+        return new Rect(this.x + deltaX, this.y + deltaY, this.width, this.height);
+    }
     includes(p) {
         return (p &&
             p.x >= this.x &&

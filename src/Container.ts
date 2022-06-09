@@ -10,7 +10,7 @@ import { Display } from "./Display.js";
 
 export interface StyleConfig {}
 
-export class Container extends View<View> {
+export abstract class Container extends View<View> {
   constructor(config: ViewConfig<View>) {
     super(config);
     for (let child of this.children) {
@@ -35,24 +35,7 @@ export class Container extends View<View> {
   }
 
   protected get visibleChildren() {
-    return this.children.filter((c) => c.props.visible);
-  }
-  protected layoutChildren() {
-    for (let child of this.visibleChildren) {
-      child.visible = child.outerFrame.intersect(this.visible);
-      child.layout();
-    }
-  }
-
-  override draw(dirty: Rect) {
-    const ctx = Display.instance.ctx;
-    ctx.save();
-    super.draw(dirty);
-    for (let child of this.visibleChildren) {
-      const d = dirty.intersect(child.visible);
-      if (d) child.draw(d);
-    }
-    ctx.restore();
+    return this.children.filter((c) => c.props.visible && c.visible);
   }
 
   public override destruct(): void {

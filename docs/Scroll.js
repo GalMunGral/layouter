@@ -1,11 +1,13 @@
 import { Container } from "./Container.js";
+import { Display } from "./Display.js";
 import { Observable } from "./Observable.js";
 export class Scroll extends Container {
     constructor(config) {
         super(config);
-        this.offset = 0;
-        this.minOffset = 0;
-        this.delta = 0;
+        this.offsetX = 0;
+        this.offsetY = 0;
+        this.minOffsetX = 0;
+        this.minOffsetY = 0;
         this.childMap = {};
         this.isLayoutRoot = true;
         if (config.data instanceof Observable) {
@@ -17,6 +19,12 @@ export class Scroll extends Container {
             this.children = config.data.map((v) => config.renderItem(v));
             this.children.forEach((child) => (child.parent = this));
         }
+    }
+    get translateX() {
+        return this.frame.x + this.offsetX;
+    }
+    get translateY() {
+        return this.frame.y + this.offsetY;
     }
     reload(data, renderItem) {
         const childMap = {};
@@ -39,16 +47,37 @@ export class Scroll extends Container {
         this.childMap = childMap;
         queueMicrotask(() => {
             this.layout();
+            this.updateVisibility(this.visible);
             this.redraw();
         });
     }
-    scroll(delta) {
-        this.delta = delta;
-        this.offset += delta;
-        this.offset = Math.min(this.offset, 0);
-        this.offset = Math.max(this.offset, this.minOffset);
-        // this.layout(); // FIX THIS
+    scroll(deltaX, deltaY) {
+        this.offsetX = Math.max(Math.min(this.offsetX + deltaX, 0), this.minOffsetX);
+        this.offsetY = Math.max(Math.min(this.offsetY + deltaY, 0), this.minOffsetY);
         this.redraw();
+    }
+    updateVisibility(visible) {
+        this.visible = this.outerFrame.intersect(visible);
+        let visibleInside = this.frame.intersect(visible);
+        if (!visibleInside)
+            return;
+        visibleInside = visibleInside.translate(-this.translateX, -this.translateY);
+        for (let child of this.children) {
+            child.updateVisibility(visibleInside);
+        }
+    }
+    draw(dirty) {
+        const ctx = Display.instance.ctx;
+        ctx.save();
+        super.draw(dirty);
+        ctx.translate(this.translateX, this.translateY);
+        const dirty$ = dirty.translate(-this.translateX, -this.translateY);
+        for (let child of this.visibleChildren) {
+            const d = dirty$.intersect(child.visible);
+            if (d)
+                child.draw(d);
+        }
+        ctx.restore();
     }
     handle(e) {
         super.handle(e);

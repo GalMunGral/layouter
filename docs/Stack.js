@@ -1,5 +1,31 @@
 import { Container } from "./Container.js";
+import { Display } from "./Display.js";
 export class Stack extends Container {
+    updateVisibility(visible) {
+        this.visible = this.outerFrame.intersect(visible);
+        let visibleInside = this.frame.intersect(visible);
+        if (!visibleInside)
+            return;
+        for (let child of this.children) {
+            child.updateVisibility(visibleInside);
+        }
+    }
+    layoutChildren() {
+        for (let child of this.visibleChildren) {
+            child.layout();
+        }
+    }
+    draw(dirty) {
+        const ctx = Display.instance.ctx;
+        ctx.save();
+        super.draw(dirty);
+        for (let child of this.visibleChildren) {
+            const d = dirty.intersect(child.visible);
+            if (d)
+                child.draw(d);
+        }
+        ctx.restore();
+    }
     finalize(child) {
         const { frame, outerFrame, deviceProps } = child;
         let [width, height] = deviceProps.dimension;

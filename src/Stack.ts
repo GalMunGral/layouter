@@ -1,7 +1,35 @@
 import { Container } from "./Container.js";
+import { Display } from "./Display.js";
+import { Rect } from "./Geometry.js";
 import { View } from "./View.js";
 
 export abstract class Stack extends Container {
+  override updateVisibility(visible: Rect | null): void {
+    this.visible = this.outerFrame.intersect(visible);
+    let visibleInside = this.frame.intersect(visible);
+    if (!visibleInside) return;
+    for (let child of this.children) {
+      child.updateVisibility(visibleInside);
+    }
+  }
+
+  protected layoutChildren() {
+    for (let child of this.visibleChildren) {
+      child.layout();
+    }
+  }
+
+  override draw(dirty: Rect) {
+    const ctx = Display.instance.ctx;
+    ctx.save();
+    super.draw(dirty);
+    for (let child of this.visibleChildren) {
+      const d = dirty.intersect(child.visible);
+      if (d) child.draw(d);
+    }
+    ctx.restore();
+  }
+
   protected finalize(child: View): void {
     const { frame, outerFrame, deviceProps } = child;
     let [width, height] = deviceProps.dimension;

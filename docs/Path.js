@@ -10,6 +10,7 @@ export class Path extends View {
             commands: parseSvgPath(d),
         }));
     }
+    layout() { }
     draw(dirty) {
         const ctx = Display.instance.ctx;
         ctx.save();

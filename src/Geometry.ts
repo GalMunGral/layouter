@@ -10,7 +10,7 @@ export class Rect {
     public height: number
   ) {}
 
-  intersect(other: Rect | null): Rect | null {
+  intersect(other: Rect | null | undefined): Rect | null {
     if (!other) return null;
     const left = Math.max(this.x, other.x);
     const right = Math.min(this.x + this.width, other.x + other.width);
@@ -21,6 +21,10 @@ export class Rect {
     if (top >= bottom) return null;
     const height = bottom - top;
     return new Rect(left, top, width, height);
+  }
+
+  translate(deltaX: number, deltaY: number): Rect {
+    return new Rect(this.x + deltaX, this.y + deltaY, this.width, this.height);
   }
 
   includes(p?: Point) {

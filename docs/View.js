@@ -6,7 +6,7 @@ export class View {
     constructor(config) {
         this.frame = new Rect(0, 0, 0, 0);
         this.outerFrame = new Rect(0, 0, 0, 0);
-        this.visible = null;
+        this.visible = new Rect(0, 0, 0, 0);
         this.isLayoutRoot = false;
         this.children = [];
         this._props = {
@@ -43,6 +43,15 @@ export class View {
                 this._props[key] = init;
             }
         }
+    }
+    updateVisibility(visible) {
+        this.visible = this.outerFrame.intersect(visible);
+    }
+    get translateX() {
+        return 0;
+    }
+    get translateY() {
+        return 0;
     }
     get deviceProps() {
         const props = clone(this.props);
@@ -82,6 +91,7 @@ export class View {
                                 cur = cur.parent;
                             queueMicrotask(() => {
                                 cur.layout();
+                                cur.updateVisibility(cur.visible);
                                 cur.redraw();
                             });
                         }
@@ -103,7 +113,6 @@ export class View {
         const props = this.deviceProps;
         return this.frame.height - props.padding[0] - props.padding[2];
     }
-    layout() { }
     draw(dirty) {
         const ctx = Display.instance.ctx;
         const { backgroundColor, borderColor, shadowColor, shadowOffset, shadowBlur, borderWidth: bw, borderRadius, } = this.deviceProps;
@@ -150,9 +159,15 @@ export class View {
         }
     }
     redraw() {
-        if (this.visible) {
-            Display.instance.root.draw(this.visible);
+        if (!this.visible)
+            return;
+        let visible = this.visible;
+        for (let cur = this; cur; cur = cur.parent) {
+            if (!cur.visible || !cur.props.visible)
+                return;
+            visible === null || visible === void 0 ? void 0 : visible.translate(cur.translateX, cur.translateY);
         }
+        Display.instance.root.draw(visible);
     }
     destruct() { }
 }

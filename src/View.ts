@@ -32,12 +32,12 @@ export type ViewConfig<C = any> = Partial<{
   [K in keyof ViewProps]: ViewProps[K] | Observable<ViewProps[K]>;
 }> & { children?: Array<C> };
 
-export class View<C = any> {
+export abstract class View<C = any> {
   public frame: Rect = new Rect(0, 0, 0, 0);
   public outerFrame: Rect = new Rect(0, 0, 0, 0);
-  public visible: Rect | null = null;
+  public visible: Rect | null = new Rect(0, 0, 0, 0);
   public isLayoutRoot = false;
-  public parent?: View<any>;
+  public parent?: View<View>;
   public children: Array<C> = [];
 
   private _props: ViewProps = {
@@ -59,6 +59,18 @@ export class View<C = any> {
     fontSize: 16,
     fontWeight: 400,
   };
+
+  public updateVisibility(visible: Rect | null): void {
+    this.visible = this.outerFrame.intersect(visible);
+  }
+
+  get translateX() {
+    return 0;
+  }
+
+  get translateY() {
+    return 0;
+  }
 
   constructor(config: ViewConfig<C>) {
     if (config.children) {
@@ -115,6 +127,7 @@ export class View<C = any> {
               while (cur != root && !cur.isLayoutRoot) cur = cur.parent!;
               queueMicrotask(() => {
                 cur.layout();
+                cur.updateVisibility(cur.visible);
                 cur.redraw();
               });
             } else {
@@ -138,7 +151,7 @@ export class View<C = any> {
     return this.frame.height - props.padding[0] - props.padding[2];
   }
 
-  public layout(): void {}
+  public abstract layout(): void;
 
   public draw(dirty: Rect): void {
     const ctx = Display.instance.ctx;
@@ -216,9 +229,13 @@ export class View<C = any> {
   }
 
   public redraw(): void {
-    if (this.visible) {
-      Display.instance.root.draw(this.visible);
+    if (!this.visible) return;
+    let visible = this.visible;
+    for (let cur: View | undefined = this; cur; cur = cur.parent) {
+      if (!cur.visible || !cur.props.visible) return;
+      visible?.translate(cur.translateX, cur.translateY);
     }
+    Display.instance.root.draw(visible);
   }
 
   public destruct(): void {}

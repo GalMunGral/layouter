@@ -6,13 +6,13 @@ export class HScroll extends Scroll {
         if (e.handled)
             return;
         if (e instanceof WheelEvent && Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-            this.scroll(-e.deltaX);
+            this.scroll(-e.deltaX, 0);
             e.handled = true;
         }
     }
     layout() {
-        let x = this.frame.x + this.offset;
-        let y = this.frame.y;
+        let x = 0;
+        let y = 0;
         let contentWidth = 0;
         for (let child of this.visibleChildren) {
             let [width, height] = child.deviceProps.dimension;
@@ -28,7 +28,9 @@ export class HScroll extends Scroll {
             x += child.outerFrame.width;
             contentWidth += child.outerFrame.width;
         }
-        this.minOffset = Math.min(this.frame.width - contentWidth, 0);
-        this.layoutChildren();
+        this.minOffsetX = Math.min(this.frame.width - contentWidth, 0);
+        for (let child of this.visibleChildren) {
+            child.layout();
+        }
     }
 }

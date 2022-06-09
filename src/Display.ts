@@ -28,9 +28,15 @@ export class Display {
     this.canvas.height = window.innerHeight * window.devicePixelRatio;
     this.canvas.style.width = window.innerWidth + "px";
     this.canvas.style.height = window.innerHeight + "px";
-    this.root.frame = new Rect(0, 0, this.canvas.width, this.canvas.height);
+    this.root.outerFrame = this.root.frame = new Rect(
+      0,
+      0,
+      this.canvas.width,
+      this.canvas.height
+    );
     this.root.visible = this.root.frame;
     this.root.layout();
+    this.root.updateVisibility(this.root.frame);
     this.root.draw(this.root.frame);
   }
 

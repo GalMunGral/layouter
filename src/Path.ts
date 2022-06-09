@@ -78,6 +78,8 @@ export class Path extends View {
     }));
   }
 
+  public layout(): void {}
+
   override draw(dirty: Rect) {
     const ctx = Display.instance.ctx;
     ctx.save();
