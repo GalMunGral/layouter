@@ -1,4 +1,5 @@
 import { HStack } from "../HStack.js";
+import { Path } from "../Path.js";
 import { Text } from "../Text.js";
 import { createElement } from "../util.js";
 import { VStack } from "../VStack.js";
@@ -94,15 +95,24 @@ function Buttons() {
           },
         ]}
       />
-      <Icon
-        paths={[
-          {
-            width: 16,
-            height: 16,
-            d: "M3 1.713a.7.7 0 011.05-.607l10.89 6.288a.7.7 0 010 1.212L4.05 14.894A.7.7 0 013 14.288V1.713z",
-          },
-        ]}
-      />
+      <VStack
+        dimension={[30, 30]}
+        borderRadius={[15, 15, 15, 15]}
+        backgroundColor={[255, 255, 255, 1]}
+      >
+        <Path
+          weight={1}
+          dimension={[16, 16]}
+          color={[24, 24, 24, 1]}
+          paths={[
+            {
+              width: 16,
+              height: 16,
+              d: "M3 1.713a.7.7 0 011.05-.607l10.89 6.288a.7.7 0 010 1.212L4.05 14.894A.7.7 0 013 14.288V1.713z",
+            },
+          ]}
+        />
+      </VStack>
       <Icon
         paths={[
           {

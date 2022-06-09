@@ -1,4 +1,5 @@
 import { HStack } from "../HStack.js";
+import { Path } from "../Path.js";
 import { Text } from "../Text.js";
 import { createElement } from "../util.js";
 import { VStack } from "../VStack.js";
@@ -45,13 +46,14 @@ function Buttons() {
                     d: "M3.3 1a.7.7 0 01.7.7v5.15l9.95-5.744a.7.7 0 011.05.606v12.575a.7.7 0 01-1.05.607L4 9.149V14.3a.7.7 0 01-.7.7H1.7a.7.7 0 01-.7-.7V1.7a.7.7 0 01.7-.7h1.6z",
                 },
             ] }),
-        createElement(Icon, { paths: [
-                {
-                    width: 16,
-                    height: 16,
-                    d: "M3 1.713a.7.7 0 011.05-.607l10.89 6.288a.7.7 0 010 1.212L4.05 14.894A.7.7 0 013 14.288V1.713z",
-                },
-            ] }),
+        createElement(VStack, { dimension: [30, 30], borderRadius: [15, 15, 15, 15], backgroundColor: [255, 255, 255, 1] },
+            createElement(Path, { weight: 1, dimension: [16, 16], color: [24, 24, 24, 1], paths: [
+                    {
+                        width: 16,
+                        height: 16,
+                        d: "M3 1.713a.7.7 0 011.05-.607l10.89 6.288a.7.7 0 010 1.212L4.05 14.894A.7.7 0 013 14.288V1.713z",
+                    },
+                ] })),
         createElement(Icon, { paths: [
                 {
                     width: 16,
