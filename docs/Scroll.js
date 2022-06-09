@@ -17,9 +17,6 @@ export class Scroll extends Container {
         this.canvas.width = 5000;
         this.canvas.height = 5000;
         this.hiddenCtx = this.canvas.getContext("2d");
-        for (let child of this.children) {
-            child.ctx = this.hiddenCtx;
-        }
         if (config.data instanceof Observable) {
             config.data.subscribe((v) => {
                 this.reload(v, config.renderItem);
@@ -80,7 +77,6 @@ export class Scroll extends Container {
         super.handle(e);
     }
     scroll(deltaX, deltaY) {
-        console.log("scroll");
         this.offsetX = Math.max(Math.min(this.offsetX + deltaX, 0), this.minOffsetX);
         this.offsetY = Math.max(Math.min(this.offsetY + deltaY, 0), this.minOffsetY);
         let visible = this.outerFrame;

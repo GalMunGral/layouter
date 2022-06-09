@@ -19,7 +19,7 @@ export function Section({ title }: { title: string }) {
         {title}
       </Text>
       <HScroll
-        dimension={[Infinity, 700]}
+        dimension={[Infinity, 300]}
         data={loadAlbums(title)}
         renderItem={({ url, id }) => {
           return <Card id={id} url={url} />;

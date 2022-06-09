@@ -30,6 +30,7 @@ export class Display {
     this.ctx = this.canvas.getContext("2d")!;
 
     this.render();
+    console.log(this.root);
   }
 
   render() {

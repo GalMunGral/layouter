@@ -7,7 +7,7 @@ import { createElement } from "../util.js";
 export function Section({ title }) {
     return (createElement(VStack, { dimension: [Infinity, 400] },
         createElement(Text, { dimension: [Infinity, 64], margin: [20, 20, 20, 20], textAlign: "start", fontSize: 24, fontWeight: 600, color: [255, 255, 255, 1] }, title),
-        createElement(HScroll, { dimension: [Infinity, 700], data: loadAlbums(title), renderItem: ({ url, id }) => {
+        createElement(HScroll, { dimension: [Infinity, 300], data: loadAlbums(title), renderItem: ({ url, id }) => {
                 return createElement(Card, { id: id, url: url });
             } })));
 }

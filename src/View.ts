@@ -1,4 +1,3 @@
-import { Container } from "./Container.js";
 import { Display } from "./Display.js";
 import { Event, MouseClickEvent } from "./Event.js";
 import { Rect } from "./Geometry.js";
@@ -6,10 +5,6 @@ import { Observable } from "./Observable.js";
 
 export type vec4 = [number, number, number, number];
 export type vec2 = [number, number];
-
-// export type LayoutContext = {
-//   ctx: CanvasRenderingContext2D;
-// };
 
 export type ViewProps = {
   visible: boolean;
@@ -126,9 +121,8 @@ export abstract class View<C = any> {
               queueMicrotask(() => {
                 view.layoutRoot.parent!.layout();
                 view.layoutRoot.parent?.children.forEach((child) => {
-                  child.draw(child.ctx!, child.outerFrame, true); // RECURSIVE?
+                  child.redraw();
                 });
-                Display.instance.compose(Display.instance.root.outerFrame);
               });
             } else {
               queueMicrotask(() => {
@@ -154,11 +148,12 @@ export abstract class View<C = any> {
   public abstract layout(): void;
 
   public redraw() {
-    console.log("redraw");
     if (!this.layoutRoot.ctx) return;
     const { x, y, width, height } = this.outerFrame;
     this.layoutRoot.ctx.clearRect(x, y, width, height);
+    this.layoutRoot.ctx.save();
     this.layoutRoot.draw(this.layoutRoot.ctx!, this.outerFrame);
+    this.layoutRoot.ctx.restore(); // ?
     let visible = this.outerFrame;
     for (let cur = this.parent; cur; cur = cur.parent) {
       visible = visible.translate(cur.translateX, cur.translateY);
@@ -168,7 +163,7 @@ export abstract class View<C = any> {
 
   get layoutRoot(): View {
     let cur: View = this;
-    while (cur.parent && !cur.parent?.isLayoutRoot) cur = cur.parent!;
+    while (cur.parent && !cur.parent.isLayoutRoot) cur = cur.parent;
     return cur;
   }
 
@@ -187,10 +182,21 @@ export abstract class View<C = any> {
     const { x, y, width, height } = this.frame;
     const [r0, r1, r2, r3] = borderRadius;
 
-    if (dirty) {
-      ctx.beginPath();
-      ctx.rect(dirty.x, dirty.y, dirty.width, dirty.height);
-      ctx.clip();
+    // if (dirty) {
+    //   ctx.beginPath();
+    //   ctx.rect(dirty.x, dirty.y, dirty.width, dirty.height);
+    //   ctx.clip();
+    // }
+
+    //@ts-ignore
+    if (this.__proto__.constructor.name == "HScroll") {
+      // ctx.fillStyle = "red";
+      // ctx.fillRect(
+      //   this.frame.x,
+      //   this.frame.y,
+      //   this.frame.width,
+      //   this.frame.height
+      // );
     }
 
     ctx.shadowColor = "rgba(" + shadowColor.join(",") + ")";

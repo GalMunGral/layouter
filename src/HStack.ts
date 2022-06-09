@@ -25,7 +25,7 @@ export class HStack extends Stack {
     let totalWeight = 0;
     for (let child of this.displayChildren) {
       const props = child.deviceProps;
-      total -= Math.min(props.dimension[0], this.frame.width);
+      total -= props.dimension[0];
       totalWeight += props.weight!;
     }
     let rem = total;

@@ -28,10 +28,6 @@ export abstract class Scroll<T extends { id: string } = any> extends Container {
     this.canvas.height = 5000;
     this.hiddenCtx = this.canvas.getContext("2d")!;
 
-    for (let child of this.children) {
-      child.ctx = this.hiddenCtx;
-    }
-
     if (config.data instanceof Observable) {
       config.data.subscribe((v) => {
         this.reload(v, config.renderItem);
@@ -92,7 +88,6 @@ export abstract class Scroll<T extends { id: string } = any> extends Container {
   }
 
   protected scroll(deltaX: number, deltaY: number) {
-    console.log("scroll");
     this.offsetX = Math.max(
       Math.min(this.offsetX + deltaX, 0),
       this.minOffsetX
@@ -102,6 +97,7 @@ export abstract class Scroll<T extends { id: string } = any> extends Container {
       this.minOffsetY
     );
     let visible = this.outerFrame;
+
     for (let cur = this.parent; cur; cur = cur.parent) {
       visible = visible.translate(cur.translateX, cur.translateY);
     }

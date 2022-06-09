@@ -86,9 +86,8 @@ export class View {
                                 var _a;
                                 view.layoutRoot.parent.layout();
                                 (_a = view.layoutRoot.parent) === null || _a === void 0 ? void 0 : _a.children.forEach((child) => {
-                                    child.draw(child.ctx, child.outerFrame, true); // RECURSIVE?
+                                    child.redraw();
                                 });
-                                Display.instance.compose(Display.instance.root.outerFrame);
                             });
                         }
                         else {
@@ -110,12 +109,13 @@ export class View {
         return this.frame.height - props.padding[0] - props.padding[2];
     }
     redraw() {
-        console.log("redraw");
         if (!this.layoutRoot.ctx)
             return;
         const { x, y, width, height } = this.outerFrame;
         this.layoutRoot.ctx.clearRect(x, y, width, height);
+        this.layoutRoot.ctx.save();
         this.layoutRoot.draw(this.layoutRoot.ctx, this.outerFrame);
+        this.layoutRoot.ctx.restore(); // ?
         let visible = this.outerFrame;
         for (let cur = this.parent; cur; cur = cur.parent) {
             visible = visible.translate(cur.translateX, cur.translateY);
@@ -123,9 +123,8 @@ export class View {
         Display.instance.compose(visible);
     }
     get layoutRoot() {
-        var _a;
         let cur = this;
-        while (cur.parent && !((_a = cur.parent) === null || _a === void 0 ? void 0 : _a.isLayoutRoot))
+        while (cur.parent && !cur.parent.isLayoutRoot)
             cur = cur.parent;
         return cur;
     }
@@ -134,10 +133,20 @@ export class View {
         const { backgroundColor, borderColor, shadowColor, shadowOffset, shadowBlur, borderWidth: bw, borderRadius, } = this.deviceProps;
         const { x, y, width, height } = this.frame;
         const [r0, r1, r2, r3] = borderRadius;
-        if (dirty) {
-            ctx.beginPath();
-            ctx.rect(dirty.x, dirty.y, dirty.width, dirty.height);
-            ctx.clip();
+        // if (dirty) {
+        //   ctx.beginPath();
+        //   ctx.rect(dirty.x, dirty.y, dirty.width, dirty.height);
+        //   ctx.clip();
+        // }
+        //@ts-ignore
+        if (this.__proto__.constructor.name == "HScroll") {
+            // ctx.fillStyle = "red";
+            // ctx.fillRect(
+            //   this.frame.x,
+            //   this.frame.y,
+            //   this.frame.width,
+            //   this.frame.height
+            // );
         }
         ctx.shadowColor = "rgba(" + shadowColor.join(",") + ")";
         ctx.shadowBlur = shadowBlur;

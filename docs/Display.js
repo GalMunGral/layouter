@@ -15,6 +15,7 @@ export class Display {
         this.canvas.height = 10000;
         this.ctx = this.canvas.getContext("2d");
         this.render();
+        console.log(this.root);
     }
     render() {
         this.displayCanvas.width = window.innerWidth * window.devicePixelRatio;

@@ -4,7 +4,7 @@ export class Stack extends Container {
     constructor(config) {
         super(config);
         for (let child of this.children) {
-            child.ctx = this.ctx;
+            child.parent = this;
         }
     }
     layoutChildren() {
@@ -45,8 +45,6 @@ export class Stack extends Container {
         ctx.save();
         super.draw(ctx, dirty);
         for (let child of this.displayChildren) {
-            // let d = child.frame.intersect(dirty);
-            // if (d)
             child.draw(ctx, dirty, recursive);
         }
         ctx.restore();
