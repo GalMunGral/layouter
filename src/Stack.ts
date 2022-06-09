@@ -1,5 +1,6 @@
 import { Container } from "./Container.js";
 import { Display } from "./Display.js";
+import { Event, MouseEnterEvent, MouseExitEvent } from "./Event.js";
 import { Rect } from "./Geometry.js";
 import { View } from "./View.js";
 
@@ -14,9 +15,25 @@ export abstract class Stack extends Container {
   }
 
   protected layoutChildren() {
-    for (let child of this.visibleChildren) {
+    for (let child of this.displayChildren) {
       child.layout();
     }
+  }
+
+  override handle(e: Event): void {
+    for (let child of this.visibleChildren) {
+      if (child.frame.includes(e.point)) {
+        if (!child.frame.includes(Event.previous?.point)) {
+          child.handle(new MouseEnterEvent(e.point));
+        }
+        child.handle(e);
+      } else {
+        if (child.frame.includes(Event.previous?.point)) {
+          child.handle(new MouseExitEvent(e.point));
+        }
+      }
+    }
+    super.handle(e);
   }
 
   override draw(dirty: Rect) {

@@ -1,5 +1,6 @@
 import { Container } from "./Container.js";
 import { Display } from "./Display.js";
+import { Event, MouseEnterEvent, MouseExitEvent } from "./Event.js";
 export class Stack extends Container {
     updateVisibility(visible) {
         this.visible = this.outerFrame.intersect(visible);
@@ -11,9 +12,26 @@ export class Stack extends Container {
         }
     }
     layoutChildren() {
-        for (let child of this.visibleChildren) {
+        for (let child of this.displayChildren) {
             child.layout();
         }
+    }
+    handle(e) {
+        var _a, _b;
+        for (let child of this.visibleChildren) {
+            if (child.frame.includes(e.point)) {
+                if (!child.frame.includes((_a = Event.previous) === null || _a === void 0 ? void 0 : _a.point)) {
+                    child.handle(new MouseEnterEvent(e.point));
+                }
+                child.handle(e);
+            }
+            else {
+                if (child.frame.includes((_b = Event.previous) === null || _b === void 0 ? void 0 : _b.point)) {
+                    child.handle(new MouseExitEvent(e.point));
+                }
+            }
+        }
+        super.handle(e);
     }
     draw(dirty) {
         const ctx = Display.instance.ctx;

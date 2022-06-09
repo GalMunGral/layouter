@@ -121,6 +121,21 @@ export class View {
         ctx.beginPath();
         ctx.rect(dirty.x, dirty.y, dirty.width, dirty.height);
         ctx.clip();
+        // ctx.save();
+        // ctx.strokeStyle = "blue";
+        // ctx.strokeRect(dirty?.x, dirty?.y, dirty?.width, dirty?.height);
+        // ctx.restore();
+        // if (this.visible) {
+        //   ctx.save();
+        //   ctx.strokeStyle = "red";
+        //   ctx.strokeRect(
+        //     this.visible?.x,
+        //     this.visible?.y,
+        //     this.visible?.width,
+        //     this.visible?.height
+        //   );
+        //   ctx.restore();
+        // }
         ctx.shadowColor = "rgba(" + shadowColor.join(",") + ")";
         ctx.shadowBlur = shadowBlur;
         ctx.shadowOffsetX = shadowOffset[0];
@@ -162,12 +177,13 @@ export class View {
         if (!this.visible)
             return;
         let visible = this.visible;
-        for (let cur = this; cur; cur = cur.parent) {
+        for (let cur = this.parent; cur; cur = cur.parent) {
             if (!cur.visible || !cur.props.visible)
                 return;
-            visible === null || visible === void 0 ? void 0 : visible.translate(cur.translateX, cur.translateY);
+            visible = visible === null || visible === void 0 ? void 0 : visible.translate(cur.translateX, cur.translateY);
         }
         Display.instance.root.draw(visible);
+        Display.instance.ctx.resetTransform();
     }
     destruct() { }
 }

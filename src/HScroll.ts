@@ -16,7 +16,7 @@ export class HScroll<T extends { id: string }> extends Scroll<T> {
     let x = 0;
     let y = 0;
     let contentWidth = 0;
-    for (let child of this.visibleChildren) {
+    for (let child of this.displayChildren) {
       let [width, height] = child.deviceProps.dimension;
       let [top, right, bottom, left] = child.deviceProps.margin.map((x) =>
         Math.max(0, x)
@@ -33,7 +33,7 @@ export class HScroll<T extends { id: string }> extends Scroll<T> {
       contentWidth += child.outerFrame.width;
     }
     this.minOffsetX = Math.min(this.frame.width - contentWidth, 0);
-    for (let child of this.visibleChildren) {
+    for (let child of this.displayChildren) {
       child.layout();
     }
   }

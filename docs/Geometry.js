@@ -3,6 +3,9 @@ export class Point {
         this.x = x;
         this.y = y;
     }
+    translate(deltaX, deltaY) {
+        return new Point(this.x + deltaX, this.y + deltaY);
+    }
 }
 export class Rect {
     constructor(x, y, width, height) {

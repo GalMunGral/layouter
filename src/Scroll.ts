@@ -1,6 +1,12 @@
 import { Container } from "./Container.js";
 import { Display } from "./Display.js";
-import { Event, MouseDownEvent, MouseUpEvent } from "./Event.js";
+import {
+  Event,
+  MouseDownEvent,
+  MouseEnterEvent,
+  MouseExitEvent,
+  MouseUpEvent,
+} from "./Event.js";
 import { Point, Rect } from "./Geometry.js";
 import { Observable } from "./Observable.js";
 import { View, ViewConfig } from "./View.js";
@@ -63,6 +69,24 @@ export abstract class Scroll<T extends { id: string }> extends Container {
     });
   }
 
+  override handle(e: Event): void {
+    e.translate(-this.translateX, -this.translateY);
+    for (let child of this.visibleChildren) {
+      if (child.frame.includes(e.point)) {
+        if (!child.frame.includes(Event.previous?.point)) {
+          child.handle(new MouseEnterEvent(e.point));
+        }
+        child.handle(e);
+      } else {
+        if (child.frame.includes(Event.previous?.point)) {
+          child.handle(new MouseExitEvent(e.point));
+        }
+      }
+    }
+    e.translate(this.translateX, this.translateY);
+    super.handle(e);
+  }
+
   protected scroll(deltaX: number, deltaY: number) {
     this.offsetX = Math.max(
       Math.min(this.offsetX + deltaX, 0),
@@ -72,6 +96,7 @@ export abstract class Scroll<T extends { id: string }> extends Container {
       Math.min(this.offsetY + deltaY, 0),
       this.minOffsetY
     );
+    this.updateVisibility(this.visible);
     this.redraw();
   }
 
@@ -96,9 +121,5 @@ export abstract class Scroll<T extends { id: string }> extends Container {
       if (d) child.draw(d);
     }
     ctx.restore();
-  }
-
-  handle(e: Event): void {
-    super.handle(e);
   }
 }

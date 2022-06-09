@@ -1,5 +1,8 @@
 export class Point {
   constructor(public x: number, public y: number) {}
+  translate(deltaX: number, deltaY: number): Point {
+    return new Point(this.x + deltaX, this.y + deltaY);
+  }
 }
 
 export class Rect {

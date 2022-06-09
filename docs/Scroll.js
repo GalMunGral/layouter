@@ -1,5 +1,6 @@
 import { Container } from "./Container.js";
 import { Display } from "./Display.js";
+import { Event, MouseEnterEvent, MouseExitEvent, } from "./Event.js";
 import { Observable } from "./Observable.js";
 export class Scroll extends Container {
     constructor(config) {
@@ -51,9 +52,29 @@ export class Scroll extends Container {
             this.redraw();
         });
     }
+    handle(e) {
+        var _a, _b;
+        e.translate(-this.translateX, -this.translateY);
+        for (let child of this.visibleChildren) {
+            if (child.frame.includes(e.point)) {
+                if (!child.frame.includes((_a = Event.previous) === null || _a === void 0 ? void 0 : _a.point)) {
+                    child.handle(new MouseEnterEvent(e.point));
+                }
+                child.handle(e);
+            }
+            else {
+                if (child.frame.includes((_b = Event.previous) === null || _b === void 0 ? void 0 : _b.point)) {
+                    child.handle(new MouseExitEvent(e.point));
+                }
+            }
+        }
+        e.translate(this.translateX, this.translateY);
+        super.handle(e);
+    }
     scroll(deltaX, deltaY) {
         this.offsetX = Math.max(Math.min(this.offsetX + deltaX, 0), this.minOffsetX);
         this.offsetY = Math.max(Math.min(this.offsetY + deltaY, 0), this.minOffsetY);
+        this.updateVisibility(this.visible);
         this.redraw();
     }
     updateVisibility(visible) {
@@ -78,8 +99,5 @@ export class Scroll extends Container {
                 child.draw(d);
         }
         ctx.restore();
-    }
-    handle(e) {
-        super.handle(e);
     }
 }

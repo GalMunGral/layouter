@@ -4,6 +4,10 @@ export class Event {
   static previous: Event;
   public handled = false;
   constructor(public point: Point) {}
+  translate(deltaX: number, deltaY: number): void {
+    this.point.x += deltaX;
+    this.point.y += deltaY;
+  }
 }
 
 export class MouseDownEvent extends Event {}

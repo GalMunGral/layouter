@@ -3,6 +3,10 @@ export class Event {
         this.point = point;
         this.handled = false;
     }
+    translate(deltaX, deltaY) {
+        this.point.x += deltaX;
+        this.point.y += deltaY;
+    }
 }
 export class MouseDownEvent extends Event {
 }

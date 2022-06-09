@@ -18,20 +18,8 @@ export abstract class Container extends View<View> {
     }
   }
 
-  override handle(e: Event): void {
-    for (let child of this.visibleChildren) {
-      if (child.frame.includes(e.point)) {
-        if (!child.frame.includes(Event.previous?.point)) {
-          child.handle(new MouseEnterEvent(e.point));
-        }
-        child.handle(e);
-      } else {
-        if (child.frame.includes(Event.previous?.point)) {
-          child.handle(new MouseExitEvent(e.point));
-        }
-      }
-    }
-    super.handle(e);
+  protected get displayChildren() {
+    return this.children.filter((c) => c.props.visible);
   }
 
   protected get visibleChildren() {
