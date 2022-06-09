@@ -1,13 +1,10 @@
 import { Container } from "./Container.js";
-import { Point } from "./Geometry.js";
 import { Observable } from "./Observable.js";
 export class Scroll extends Container {
     constructor(config) {
         super(config);
         this.offset = 0;
         this.minOffset = 0;
-        this.scrolling = false;
-        this.mousePosition = new Point(0, 0);
         this.delta = 0;
         this.childMap = {};
         this.isLayoutRoot = true;
@@ -50,7 +47,7 @@ export class Scroll extends Container {
         this.offset += delta;
         this.offset = Math.min(this.offset, 0);
         this.offset = Math.max(this.offset, this.minOffset);
-        this.layout();
+        // this.layout(); // FIX THIS
         this.redraw();
     }
     handle(e) {

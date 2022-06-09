@@ -12,8 +12,6 @@ type ScrollConfig<T extends { id: string }> = {
 export abstract class Scroll<T extends { id: string }> extends Container {
   protected offset = 0;
   protected minOffset = 0;
-  protected scrolling = false;
-  protected mousePosition: Point = new Point(0, 0);
   protected delta = 0;
   private childMap: Record<string, View> = {};
   public override isLayoutRoot = true;
@@ -59,7 +57,7 @@ export abstract class Scroll<T extends { id: string }> extends Container {
     this.offset += delta;
     this.offset = Math.min(this.offset, 0);
     this.offset = Math.max(this.offset, this.minOffset);
-    this.layout();
+    // this.layout(); // FIX THIS
     this.redraw();
   }
 
