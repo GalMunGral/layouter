@@ -7,7 +7,7 @@ import { View, ViewConfig } from "./View.js";
 
 type ScrollConfig<T extends { id: string }> = {
   data: Array<T> | Observable<Array<T>>;
-  renderItem: (t: T) => View;
+  renderItem: (t: T, i: number) => View;
 };
 
 export abstract class Scroll<T extends { id: string } = any> extends Container {
@@ -31,9 +31,18 @@ export abstract class Scroll<T extends { id: string } = any> extends Container {
     if (config.data instanceof Observable) {
       config.data.subscribe((v) => {
         this.reload(v, config.renderItem);
+        queueMicrotask(() => {
+          this.layout();
+          this.drawContent(); // OPTIMIZE THIS
+          let visible = this.outerFrame;
+          for (let cur = this.parent; cur; cur = cur.parent) {
+            visible = visible.translate(cur.translateX, cur.translateY);
+          }
+          Display.instance.compose(visible);
+        });
       });
     } else {
-      this.children = config.data.map((v) => config.renderItem(v));
+      this.children = config.data.map((v, i) => config.renderItem(v, i));
       this.children.forEach((child) => (child.parent = this));
     }
   }
@@ -45,12 +54,12 @@ export abstract class Scroll<T extends { id: string } = any> extends Container {
   override get translateY() {
     return this.frame.y + this.offsetY;
   }
-  private reload(data: Array<T>, renderItem: (t: T) => View): void {
+  private reload(data: Array<T>, renderItem: (t: T, i: number) => View): void {
     const childMap: Record<string, View> = {};
     this.children = [];
-    for (let item of data) {
+    for (let [i, item] of data.entries()) {
       if (!(item.id in this.childMap)) {
-        const child = renderItem(item);
+        const child = renderItem(item, i);
         child.parent = this;
         this.children.push(child);
       } else {
@@ -63,10 +72,6 @@ export abstract class Scroll<T extends { id: string } = any> extends Container {
       view.destruct();
     }
     this.childMap = childMap;
-    queueMicrotask(() => {
-      this.layout();
-      this.drawContent(); // OPTIMIZE THIS
-    });
   }
 
   override handle(e: Event): void {

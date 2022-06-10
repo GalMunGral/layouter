@@ -20,10 +20,19 @@ export class Scroll extends Container {
         if (config.data instanceof Observable) {
             config.data.subscribe((v) => {
                 this.reload(v, config.renderItem);
+                queueMicrotask(() => {
+                    this.layout();
+                    this.drawContent(); // OPTIMIZE THIS
+                    let visible = this.outerFrame;
+                    for (let cur = this.parent; cur; cur = cur.parent) {
+                        visible = visible.translate(cur.translateX, cur.translateY);
+                    }
+                    Display.instance.compose(visible);
+                });
             });
         }
         else {
-            this.children = config.data.map((v) => config.renderItem(v));
+            this.children = config.data.map((v, i) => config.renderItem(v, i));
             this.children.forEach((child) => (child.parent = this));
         }
     }
@@ -36,9 +45,9 @@ export class Scroll extends Container {
     reload(data, renderItem) {
         const childMap = {};
         this.children = [];
-        for (let item of data) {
+        for (let [i, item] of data.entries()) {
             if (!(item.id in this.childMap)) {
-                const child = renderItem(item);
+                const child = renderItem(item, i);
                 child.parent = this;
                 this.children.push(child);
             }
@@ -52,10 +61,6 @@ export class Scroll extends Container {
             view.destruct();
         }
         this.childMap = childMap;
-        queueMicrotask(() => {
-            this.layout();
-            this.drawContent(); // OPTIMIZE THIS
-        });
     }
     handle(e) {
         var _a, _b;

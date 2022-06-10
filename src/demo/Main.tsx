@@ -15,11 +15,11 @@ export function Main() {
         backgroundColor={[40, 40, 40, 1]}
         data={[
           { id: "1", title: "Recently played" },
-          { id: "1", title: "Uniquely yours" },
-          { id: "1", title: "Fresh new music" },
+          { id: "2", title: "Uniquely yours" },
+          { id: "3", title: "Fresh new music" },
         ]}
-        renderItem={({ title }) => {
-          return <Section title={title} />;
+        renderItem={({ title }, i) => {
+          return <Section async={!i} title={title} />;
         }}
       />
     </HStack>
