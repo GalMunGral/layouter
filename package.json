@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "run-p \"build -- --watch\" serve",
-    "build": "tsc",
+    "build": "tsc && cp index.html dist",
     "serve": "serve docs"
   },
   "license": "ISC",
