@@ -1,5 +1,3 @@
-# Michelangelo
+Web UI without DOM and CSSOM
 
-A UI experiment with only JavaScript (without DOM/CSSOM).
-
-demo: https://galmungral.github.io/michelangelo
+https://galmungral.github.io/michelangelo
