@@ -1,10 +1,10 @@
 {
-  "name": "layouter",
+  "name": "michelangelo",
   "version": "1.0.0",
   "scripts": {
-    "dev": "run-p \"build -- --watch\" serve",
-    "build": "tsc && cp index.html dist",
-    "serve": "serve docs"
+    "build": "tsc",
+    "postbuild": "cp index.html dist",
+    "serve": "serve dist"
   },
   "license": "ISC",
   "devDependencies": {
