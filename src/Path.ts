@@ -418,7 +418,7 @@ function parseSvgPath(d: string): Array<Command> {
   }
 
   function angle(ux: number, uy: number, vx: number, vy: number): number {
-    let sign = ux * vy - uy * vx > 1 ? 1 : -1;
+    let sign = ux * vy - uy * vx > 0 ? 1 : -1;
     return (
       acos(
         (ux * vx + uy * vy) /
