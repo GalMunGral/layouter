@@ -1,7 +1,6 @@
 import { HStack } from "../HStack.js";
 import { createElement } from "../util.js";
 import { VScroll } from "../VScroll.js";
-import { VStack } from "../VStack.js";
 import { Menu } from "./Menu.js";
 import { Section } from "./Section.js";
 

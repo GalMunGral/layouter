@@ -22,7 +22,7 @@ export class Text extends View<string | Observable<string>> {
       this.children[0].subscribe((v) => {
         queueMicrotask(() => {
           this.layout();
-          this.redraw();
+          this.redraw("text updated");
         });
         this.content = v;
       });

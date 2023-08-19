@@ -2,6 +2,7 @@ import { Display } from "./Display.js";
 import { Event, MouseClickEvent } from "./Event.js";
 import { Rect } from "./Geometry.js";
 import { Observable } from "./Observable.js";
+import { shallowEqual } from "./util.js";
 
 export type vec4 = [number, number, number, number];
 export type vec2 = [number, number];
@@ -85,6 +86,11 @@ export abstract class View<C = any> {
     }
   }
 
+  // private path: string = "";
+  // public setDebugPath(path: string) {
+  //   this.path = path;
+  // }
+
   get deviceProps(): ViewProps {
     const props = clone(this.props);
     for (let key of ["borderWidth", "shadowBlur", "fontSize"]) {
@@ -102,11 +108,16 @@ export abstract class View<C = any> {
     return props;
   }
 
+  public layoutScheduled = false;
+  public redrawScheduled = false;
+
   get props(): ViewProps {
     const view = this;
     return new Proxy(this._props, {
       set(target, prop, value, receiver) {
-        if (value == Reflect.get(target, prop, receiver)) return true;
+        if (shallowEqual(value, Reflect.get(target, prop, receiver))) {
+          return true;
+        }
         try {
           return Reflect.set(target, prop, value, receiver);
         } finally {
@@ -118,16 +129,24 @@ export abstract class View<C = any> {
               prop == "weight" ||
               prop == "fontFamily"
             ) {
-              queueMicrotask(() => {
-                view.layoutRoot.parent!.layout();
-                view.layoutRoot.parent?.children.forEach((child) => {
-                  child.redraw();
+              if (!view.layoutScheduled) {
+                view.layoutScheduled = true;
+                queueMicrotask(() => {
+                  view.layoutScheduled = false;
+                  view.layoutRoot.parent!.layout();
+                  view.layoutRoot.parent?.children.forEach((child) => {
+                    child.redraw(`layout ${prop} changed`);
+                  });
                 });
-              });
+              }
             } else {
-              queueMicrotask(() => {
-                view.redraw();
-              });
+              if (!view.redrawScheduled) {
+                view.redrawScheduled = true;
+                queueMicrotask(() => {
+                  view.redrawScheduled = false;
+                  view.redraw(`style ${prop.toString()} changed`);
+                });
+              }
             }
           }
         }
@@ -147,7 +166,8 @@ export abstract class View<C = any> {
 
   public abstract layout(): void;
 
-  public redraw() {
+  public redraw(reason?: string) {
+    // console.debug(this.path, reason);
     if (!this.layoutRoot.ctx) return;
     const { x, y, width, height } = this.outerFrame;
     this.layoutRoot.ctx.clearRect(x, y, width, height);

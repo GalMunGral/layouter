@@ -22,7 +22,7 @@ export class Video extends View {
     el.onplay = () => {
       this.layout();
       const drawFrame = () => {
-        this.redraw();
+        this.redraw("frame updated");
         this.rafHandle = requestAnimationFrame(drawFrame);
       };
       this.rafHandle = requestAnimationFrame(drawFrame);

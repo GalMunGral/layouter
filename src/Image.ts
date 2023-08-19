@@ -22,7 +22,7 @@ export class Image extends View {
         el.onload = () => {
           this.el = el;
           this.layout();
-          this.redraw();
+          this.redraw("image updated");
         };
       });
     } else {
@@ -31,7 +31,7 @@ export class Image extends View {
       el.onload = () => {
         this.el = el;
         this.layout();
-        this.redraw();
+        this.redraw("image loaded");
       };
     }
   }
