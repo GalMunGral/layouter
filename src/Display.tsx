@@ -3,12 +3,10 @@ import {
   Event,
   MouseClickEvent,
   MouseDownEvent,
-  MouseMoveEvent,
   MouseUpEvent,
   WheelEvent,
 } from "./Event.js";
 import { Point, Rect } from "./Geometry.js";
-import { View } from "./View.js";
 
 export class Display {
   public static instance: Display;
@@ -108,19 +106,24 @@ export class Display {
     //   this.root.handle(evt);
     //   Event.previous = evt;
     // });
-    window.onwheel = throttle((e) => {
-      const pos = new Point(
-        e.clientX * window.devicePixelRatio,
-        e.clientY * window.devicePixelRatio
-      );
-      const evt = new WheelEvent(
-        pos,
-        e.deltaX * window.devicePixelRatio,
-        e.deltaY * window.devicePixelRatio
-      );
-      this.root.handle(evt);
-      Event.previous = evt;
-    }, 16);
+    window.addEventListener(
+      "wheel",
+      (e) => {
+        e.preventDefault();
+        const pos = new Point(
+          e.clientX * window.devicePixelRatio,
+          e.clientY * window.devicePixelRatio
+        );
+        const evt = new WheelEvent(
+          pos,
+          e.deltaX * window.devicePixelRatio,
+          e.deltaY * window.devicePixelRatio
+        );
+        this.root.handle(evt);
+        Event.previous = evt;
+      },
+      { passive: false }
+    );
   }
 }
 
@@ -128,7 +131,7 @@ function debounce(f: (...arg: any[]) => void, timeout = 16) {
   let handle = -1;
   return function () {
     clearTimeout(handle);
-    handle = setTimeout(f, timeout, ...arguments);
+    handle = window.setTimeout(f, timeout, ...arguments);
   };
 }
 
