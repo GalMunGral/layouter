@@ -3,6 +3,7 @@ import {
   Event,
   MouseClickEvent,
   MouseDownEvent,
+  MouseMoveEvent,
   MouseUpEvent,
   WheelEvent,
 } from "./Event.js";
@@ -15,6 +16,7 @@ export class Display {
   public canvas: HTMLCanvasElement;
   public ctx: CanvasRenderingContext2D;
   public isLayoutRoot = true;
+  private pointerMoved = false;
 
   constructor(public root: Container) {
     Display.instance = this;
@@ -71,7 +73,9 @@ export class Display {
     window.onresize = debounce(() => {
       this.render();
     }, 100);
+
     window.onmousedown = (e) => {
+      this.pointerMoved = false;
       const pos = new Point(
         e.clientX * window.devicePixelRatio,
         e.clientY * window.devicePixelRatio
@@ -80,6 +84,18 @@ export class Display {
       this.root.handle(evt);
       Event.previous = evt;
     };
+
+    window.onmousemove = throttle((e) => {
+      this.pointerMoved = true;
+      const pos = new Point(
+        e.clientX * window.devicePixelRatio,
+        e.clientY * window.devicePixelRatio
+      );
+      const evt = new MouseMoveEvent(pos);
+      this.root.handle(evt);
+      Event.previous = evt;
+    });
+
     window.onmouseup = (e) => {
       const pos = new Point(
         e.clientX * window.devicePixelRatio,
@@ -88,25 +104,14 @@ export class Display {
       const evt = new MouseUpEvent(pos);
       this.root.handle(evt);
       Event.previous = evt;
+
+      if (!this.pointerMoved) {
+        const evt = new MouseClickEvent(pos);
+        this.root.handle(evt);
+        Event.previous = evt;
+      }
     };
-    window.onclick = (e) => {
-      const pos = new Point(
-        e.clientX * window.devicePixelRatio,
-        e.clientY * window.devicePixelRatio
-      );
-      const evt = new MouseClickEvent(pos);
-      this.root.handle(evt);
-      Event.previous = evt;
-    };
-    // window.onmousemove = throttle((e) => {
-    //   const pos = new Point(
-    //     e.clientX * window.devicePixelRatio,
-    //     e.clientY * window.devicePixelRatio
-    //   );
-    //   const evt = new MouseMoveEvent(pos);
-    //   this.root.handle(evt);
-    //   Event.previous = evt;
-    // });
+
     window.addEventListener(
       "wheel",
       (e) => {

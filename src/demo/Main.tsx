@@ -18,7 +18,7 @@ export function Main() {
           { id: "3", title: "Fresh new music" },
         ]}
         renderItem={({ title }, i) => {
-          return <Section async={!i} title={title} />;
+          return <Section async={false} title={title} />;
         }}
       />
     </HStack>

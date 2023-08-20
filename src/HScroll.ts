@@ -1,13 +1,30 @@
-import { Event, WheelEvent } from "./Event.js";
+import {
+  Event,
+  MouseDownEvent,
+  MouseMoveEvent,
+  MouseUpEvent,
+  WheelEvent,
+} from "./Event.js";
 import { Scroll } from "./Scroll.js";
 
 export class HScroll<T extends { id: string }> extends Scroll<T> {
+  private isScrollling = false;
+  private prevX = -1;
   handle(e: Event): void {
     super.handle(e);
     if (e.handled) return;
-    if (e instanceof WheelEvent && Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-      this.scroll(-e.deltaX, 0);
+    if (e instanceof MouseDownEvent) {
+      this.isScrollling = true;
+      this.prevX = e.point.x;
       e.handled = true;
+    } else if (e instanceof MouseMoveEvent) {
+      if (this.isScrollling) {
+        this.scroll(e.point.x - this.prevX, 0);
+        this.prevX = e.point.x;
+        e.handled = true;
+      }
+    } else if (e instanceof MouseUpEvent) {
+      this.isScrollling = false;
     }
   }
 
