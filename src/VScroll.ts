@@ -7,7 +7,7 @@ export class VScroll<T extends { id: string }> extends Scroll<T> {
     super.handle(e);
     if (e.handled) return;
     if (e instanceof WheelEvent && Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-      this.scroll(0, -e.deltaY);
+      this.scroll(0, -0.6 * e.deltaY);
       e.handled = true;
     }
   }

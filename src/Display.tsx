@@ -30,8 +30,7 @@ export class Display {
     this.ctx = this.canvas.getContext("2d")!;
 
     this.render();
-    // this.root.setDebugPath("");
-    console.log(this.root);
+    this.root.setDebugPath("");
   }
 
   render() {

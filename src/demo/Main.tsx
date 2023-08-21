@@ -16,6 +16,7 @@ export function Main() {
           { id: "1", title: "Recently played" },
           { id: "2", title: "Uniquely yours" },
           { id: "3", title: "Fresh new music" },
+          { id: "4", title: "Spotify Playlists" },
         ]}
         renderItem={({ title }, i) => {
           return <Section async={false} title={title} />;

@@ -24,8 +24,8 @@ export abstract class Scroll<T extends { id: string } = any> extends Container {
   constructor(config: ViewConfig & ScrollConfig<T>) {
     super(config);
     this.canvas = document.createElement("canvas");
-    this.canvas.width = 5000;
-    this.canvas.height = 5000;
+    this.canvas.width = 1;
+    this.canvas.height = 1;
     this.hiddenCtx = this.canvas.getContext("2d")!;
 
     if (config.data instanceof Observable) {
@@ -125,6 +125,11 @@ export abstract class Scroll<T extends { id: string } = any> extends Container {
 
   drawContent() {
     const { x, y, width, height } = this.contentFrame;
+    this.hiddenCtx.canvas.width = Math.max(this.hiddenCtx.canvas.width, width);
+    this.hiddenCtx.canvas.height = Math.max(
+      this.hiddenCtx.canvas.height,
+      height
+    );
     this.hiddenCtx.clearRect(x, y, width, height);
     for (let child of this.displayChildren) {
       child.draw(this.hiddenCtx, this.contentFrame, true);

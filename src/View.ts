@@ -86,10 +86,10 @@ export abstract class View<C = any> {
     }
   }
 
-  // private path: string = "";
-  // public setDebugPath(path: string) {
-  //   this.path = path;
-  // }
+  private path: string = "";
+  public setDebugPath(path: string) {
+    this.path = path;
+  }
 
   get deviceProps(): ViewProps {
     const props = clone(this.props);
@@ -202,21 +202,10 @@ export abstract class View<C = any> {
     const { x, y, width, height } = this.frame;
     const [r0, r1, r2, r3] = borderRadius;
 
-    // if (dirty) {
-    //   ctx.beginPath();
-    //   ctx.rect(dirty.x, dirty.y, dirty.width, dirty.height);
-    //   ctx.clip();
-    // }
-
-    //@ts-ignore
-    if (this.__proto__.constructor.name == "HScroll") {
-      // ctx.fillStyle = "red";
-      // ctx.fillRect(
-      //   this.frame.x,
-      //   this.frame.y,
-      //   this.frame.width,
-      //   this.frame.height
-      // );
+    if (dirty) {
+      ctx.beginPath();
+      ctx.rect(dirty.x, dirty.y, dirty.width, dirty.height);
+      ctx.clip();
     }
 
     ctx.shadowColor = "rgba(" + shadowColor.join(",") + ")";
