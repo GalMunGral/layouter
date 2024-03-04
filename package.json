@@ -1,7 +1,6 @@
 {
   "scripts": {
-    "build": "esbuild src/demo/index.tsx --bundle --outdir=dist",
-    "dev": "npm run build -- --watch"
+    "build": "esbuild src/demo/index.tsx --bundle --outdir=dist && cp src/index.html dist"
   },
   "devDependencies": {
     "esbuild": "^0.19.2"
